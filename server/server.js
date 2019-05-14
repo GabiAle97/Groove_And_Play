@@ -78,13 +78,17 @@ function cargarMusicaSubida(playlist){
 
 // GET /
 app.get('/', (req, res) => {
-    cargarMusicaSubida(playlist);
-    setTimeout(() => {
-        res.render('index', {
-            title: 'Groove And Play',
-            playlist: playlist
-        });
-    }, 2000);
+    if(req.session.userId){
+        res.redirect('/home');
+    }else{
+        cargarMusicaSubida(playlist);
+        setTimeout(() => {
+            res.render('index', {
+                title: 'Groove And Play',
+                playlist: playlist
+            });
+        }, 2000);
+    }
 });
 
 // GET /home
