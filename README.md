@@ -17,7 +17,7 @@ Se necesita tener instalado:
 Una vez dentro de la carpeta del proyecto, ejecutar el siguiente comando
 
 ```
-mongoimport --db testdb--collection users--file ./client/db/usuarios.json 
+mongoimport --db testdb --collection users --file ./server/db/usuarios.json  
 ```
 
 ### Instalación 🔧
