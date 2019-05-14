@@ -147,7 +147,7 @@ app.get('/home', (req, res) => {
         }
         else{
             //renderizo el handlebars de gallery-NoFile con los parametros de usuario, listaDiscos y playlist
-            res.render('gallery-NoFile',{
+            res.render('home-NoFile',{
                 title: 'Groove And Play - No hay discos subidos al servidor',
                 usuario: req.session.userId,
                 listaDiscos: listaDiscos,
