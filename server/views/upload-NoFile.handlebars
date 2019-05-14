@@ -1,0 +1,12 @@
+<style>
+    #upload{
+        width: 110%;
+    }
+</style>
+Debe seleccionar un archivo
+<script>
+    setTimeout(function(){
+        console.log("esto: "+ `{{redireccion}}`);
+        window.location.href = "/subirarchivos?id={{redireccion}}|{{disco}}"
+    },2000)
+</script>

@@ -1,0 +1,11 @@
+<style>
+    #upload{
+        width: 110%;
+    }
+</style>
+<form method="POST" action="/upload?id=contP|{{disco}}" enctype="multipart/form-data">
+    <label for="file">Contraportada del disco:</label>
+    <input type="file" accept="image/*" name="file">
+    <br>
+    <input type="submit" value="Confirmar">
+</form>

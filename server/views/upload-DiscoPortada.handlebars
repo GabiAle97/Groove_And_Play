@@ -1,0 +1,14 @@
+<style>
+    #upload{
+        width: 110%;
+    }
+</style>
+
+<form method="POST" action="/upload?id=port|0" enctype="multipart/form-data">
+    <label for="file">Portada del disco:</label>
+    <input type="file" accept="image/*" name="file">
+    <br>
+    <input type="text" name="nombreDisco" id="hola" required placeholder="Nombre del Disco">   
+    <input type="text" name="nombreArtista" required placeholder="Nombre del Artista">
+    <input type="submit" value="Confirmar">
+</form>

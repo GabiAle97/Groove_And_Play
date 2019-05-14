@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <style>@import url('https://fonts.googleapis.com/css?family=Noto+Sans+JP:100,300,400,500,700,900');</style>
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+</head>
+<nav>
+{{#if usuario}}
+    <img class= "img-usuario" src="../{{usuario}}/user.jpg">
+    <p class="saludo">Bienvenido<br><i style="color: rgb(158, 140, 80)">{{usuario}}</i></p>
+    <button class = "button-nav" id="home" onclick="window.location.href = '/home'">Home</button><br>
+    <button class = "button-nav" id="gallery" onclick="window.location.href = '/seeGallery'">Galería de Discos</button><br>
+    <button class = "button-nav" id="upload" onclick="window.location.href = '/subirarchivos?id=0|0'">Subir Discos</button><br>
+    <button class = "button-nav" id="logout" onclick="window.location.href = '/logout'">Log Out</button>
+    <h3 class= "contenedor-reproductor" style="font-family: 'Indie Flower', cursive;margin-bottom:70px;width: 111px;height:100px;background:none;color:rgb(158, 140, 80)" >Groove And Play</h3>
+    <img class= "contenedor-reproductor" src="../img/logo.png"></nav>
+{{else}}
+    <button class = "button-nav" id="home" onclick="window.location.href = '/home'">Home</button><br>
+    <button class = "button-nav" id="login" onclick="window.location.href = '/'">Log In</button><br>
+    <button class = "button-nav" id="signin" onclick="window.location.href = '/registro'">Sign In</button>
+    <h3 class= "contenedor-reproductor" style="font-family: 'Indie Flower', cursive;margin-bottom:70px;width: 111px;height:100px;background:none;color:rgb(158, 140, 80)" >Groove And Play</h3>
+    <img class= "contenedor-reproductor" style="width: 111px;height:100px;background:none" src="../img/logo.png"></nav>
+{{/if}}
+{{{body}}}
+<div class="contenedor-reproductor">
+    <!-- Creo un DIV para guardar el length del playlist que le paso por el metodo GET de / -->
+    <div id="playlist-length" style="display:none">{{playlist.length}}</div>
+    {{#each playlist}}
+        <!-- por cada elemento de playlist Creo un DIV oculto para guardar la url del mismo que tambien paso por el metodo GET de /-->
+        <div id="url-audio-{{@index}}" style="display:none">{{this.url}}</div>
+    {{/each}}
+    <audio class="reproductor-main" id="reproductor-pers"></audio>
+    <div>
+        <img class="boton-contenedor-tercero" id="playpausebutton" onclick="replay(this,'reproductor-pers')"  style="display:inline-flex; width: 50px; height:50px;" src="../img/replay.png">
+        <img class="boton-contenedor-secundario" id="playpausebutton" onclick="stop(this,'reproductor-pers')"  style="display:inline-flex; width: 75px; height:75px;" src="../img/stop.png">
+        <img class="boton-contenedor-primario" id="playbutton" onclick="playPause(this,'reproductor-pers')"  style="display:inline-flex; width: 100px; height:100px;" src="../img/play.png">
+        <img class="boton-contenedor-secundario" id="playpausebutton" onclick="next('reproductor-pers')"  style="display:inline-flex; width: 75px; height:75px;" src="../img/next.png">
+        <img class="boton-contenedor-tercero" id="playpausebutton" onclick="mute(this,'reproductor-pers')"  style="display:inline-flex; width: 50px; height:50px;" src="../img/speaker.png">
+    </div>
+</div>
+<script>
+    //tomo el div que tiene le length de playlist en el innerHTML
+    var divLength = document.getElementById("playlist-length")
+    //lo parseo a INT para poder usarlo
+    var lengthPlaylist = parseInt(divLength.innerHTML);
+    //Tomo el elemento que tenga el id "url-audio-*numero random que vaya del 0 al ultimo,
+    //gracias al length de playlist que guardé antes*" y tomo el url que tiene en su innerHTML
+    var numPlay = 0;
+    var url = document.getElementById(`url-audio-${numPlay}`).innerHTML;
+    //tomo el reproductor por su id
+    var reproductor = document.getElementById("reproductor-pers");
+    //cambio el source del reproductor por el url que tome dos pasos antes
+    reproductor.src = url;
+
+
+    function playPause(btn,aud){
+        var audio= document.getElementById(aud);
+        if(audio.paused){
+            audio.play();
+            durationAudio = parseInt(audio.duration) * 1000;
+            btn.src ="../img/pause.png";
+            if (audio.loop == false){
+                audio.addEventListener("ended",()=>{
+                    next(aud);
+                })
+            }
+            
+
+        }else{
+            audio.pause();
+            btn.src ="../img/play.png";
+        }
+    }
+
+    function mute(btn,aud){
+        var aud= document.getElementById(aud);
+        if(aud.volume == 0){
+            aud.volume = 1;
+            btn.src ="../img/speaker.png";
+        }else{
+            aud.volume = 0;
+            btn.src ="../img/mute.png";
+        }
+    }
+
+    function stop(btn, aud){
+        var aud= document.getElementById(aud);
+        var play = document.getElementById('playbutton');
+        if(aud.currentTime > 0){
+            aud.currentTime = 0;
+            aud.pause();
+            play.src = "../img/play.png"
+        }
+    }
+
+    function replay(btn, aud){
+        var aud= document.getElementById(aud);
+        if(aud.loop == true){
+            aud.loop = false;
+            btn.src = "../img/replay.png"
+        }else{
+            aud.loop = true;
+            btn.src = "../img/shuffle.png"
+        }
+    }
+
+    function next(aud){
+        //vuelvo a tomar todo (sino no funciona, no se por qué)
+        var repro= document.getElementById(aud);
+        var divLength = document.getElementById("playlist-length")
+        var lengthPlaylist = parseInt(divLength.innerHTML);
+        //creo un url nuevo con otro div oculto que tomo (no logre evitar que tome el mismo de vez en cuando)
+        if(numPlay == (lengthPlaylist-1)){
+            numPlay = 0;
+        }else{
+            numPlay++;
+        }
+        
+        repro.src = document.getElementById(`url-audio-${numPlay}`).innerHTML;
+        repro.play();
+
+    }
+
+</script>
+</html>

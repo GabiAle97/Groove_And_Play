@@ -1,0 +1,15 @@
+<style>
+    #upload{
+        width: 110%;
+    }
+</style>
+Hubo ciertos errores durante la subida:
+<br>
+<div>{{#each listaArchivos}}
+        <div class="resultadoArchivo">{{this.archivo}} - {{this.textoResultado}}</div>
+{{/each}}</div>
+<script>
+    setTimeout(function(){
+        window.location.href = '/subirarchivos?id={{redireccion}}|{{disco}}';
+    },5000)
+</script>

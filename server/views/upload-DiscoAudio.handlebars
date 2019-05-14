@@ -1,0 +1,11 @@
+<style>
+    #upload{
+        width: 110%;
+    }
+</style>
+<form method="POST" action="/upload?id=audio|{{disco}}" enctype="multipart/form-data">
+    <label for="file">Archivos de audio:</label>
+    <input type="file" multiple="true" accept="audio/*" name="file">
+    <br>
+    <input type="submit" value="Confirmar">
+</form>

@@ -1,0 +1,15 @@
+<style>
+    #signin{
+        width: 110%;
+    }
+</style>
+
+<h1>Registrate en Groove And Play</h1>
+<h3>para darte a conocer al resto del mundo! ;)</h3>
+
+<form action="/signin" method="post" enctype="multipart/form-data">
+    <input type="text" name="user" class="text-input user" id="user-id" placeholder="Usuario" required>
+    <input type="password" name="password" class="text-input password" id="password" placeholder="Clave" required>
+    <label for="file">Foto de perfil: </label><input type="file" accept="image/*" name="file">
+    <input type="submit" name="Login" id="do-login" class="button">
+</form>

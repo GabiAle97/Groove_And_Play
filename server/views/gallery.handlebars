@@ -1,0 +1,12 @@
+<style>
+    #gallery{
+        width: 110%;
+    }
+</style>
+
+{{#each listaDiscos}}
+    <div onclick="window.location.href='/gallery/?id={{this.nombre}}'">
+        <img src="./files/{{this.usuario}}/{{this.nombre}}/portada/portada-{{this.nombre}}.jpg">
+        <h2>{{this.nombre}}</h2>
+    </div>
+{{/each}}

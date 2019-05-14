@@ -1,0 +1,25 @@
+<style>
+    #home{
+        width: 110%;
+    }
+</style>
+<div>
+    <h1>Portada</h1>
+    {{#if fotosPortada}}
+        {{{fotosPortada}}}
+    {{/if}}
+    {{#else}}
+        El disco no posee portada
+    {{/else}}
+    
+</div>
+<div>
+    <h1>Contraportada</h1>
+    {{{fotosContraportada}}}
+
+</div>
+<div>
+    <h1>Tracklist</h1>
+    {{{audio}}}
+
+</div>
