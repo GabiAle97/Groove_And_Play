@@ -9,13 +9,17 @@ const querystring = require('querystring');
 const expressSession = require('express-session');
 const favicon = require('serve-favicon')
 
+//Creo array de objetos global que contiene todas las canciones que existen en el servidor
 var playlist=[];
 
+//lista de formatos compatibles
 const listaExtImg = ['.jpg','jpeg', '.bmp', '.gif', '.png', '.raw'];
 const listaExtSound = ['.mp3', '.m4a', '.aac', '.wma', '.wav', '.ogg'];
 
+// favicon para el tag de la pagina
 app.use(favicon('./client/favicon.ico'));
 
+//Inicializacion de express Session
 app.use(expressSession({
     secret: 'Groove And Play',
     resave: false,
@@ -54,13 +58,21 @@ let storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// funcion que carga toda la musica que existe en el servidor y la asigna a la lista "playlist" global
 function cargarMusicaSubida(playlist){
+    //leo la carpeta "files" en "client"
     fs.readdir('./client/files',(err,usuarios)=>{
+        //por cada objeto que hay dentro de "files" (detecta carpetas, cada una tiene el nombre de un usuario)...
         usuarios.forEach(usuario => {
+            //lee la carpeta con el nombre de usuario
             fs.readdir(`./client/files/${usuario}`,(err,discos)=>{
+                //por cada objeto que hay dentro de la carpeta del usuario (detecta carpetas, cada una tiene el nombre de un disco que subio)...
                 discos.forEach(disco => {
+                    //lee la carpeta "audio" que esta dentro de la carpeta con el nombre de disco
                     fs.readdir(`./client/files/${usuario}/${disco}/audio`,(err,temas)=>{
+                        //por cada audio que lee de esa carpeta
                         temas.forEach(tema => {
+                            //registra los datos que fue recolectando en la lista "playlist" global
                             playlist.push({
                                 usuario : usuario,
                                 disco : disco,
@@ -78,11 +90,17 @@ function cargarMusicaSubida(playlist){
 
 // GET /
 app.get('/', (req, res) => {
+    //si existe una sesión
     if(req.session.userId){
+        //redirecciona a /home
         res.redirect('/home');
     }else{
+        //si no existe una sesion iniciada 
+        //se carga la musica del servidor con la funcion cargarMusicaSubida que recibe la lista Playlist global
         cargarMusicaSubida(playlist);
+        //espera dos segundos a que terminen de cargarse las canciones
         setTimeout(() => {
+            //renderiza el handlebars de index pasandole el playlist global como parametro
             res.render('index', {
                 title: 'Groove And Play',
                 playlist: playlist
@@ -93,14 +111,23 @@ app.get('/', (req, res) => {
 
 // GET /home
 app.get('/home', (req, res) => {
+    //se carga la musica del servidor con la funcion cargarMusicaSubida que recibe la lista Playlist global
     cargarMusicaSubida(playlist);
-    listaDiscos=[]
+    //creo una lista de objetos vacia
+    var listaDiscos=[]
+    //lee la carpeta "files" de "client"
     fs.readdir(`./client/files`,(err,archivos)=>{
+        //si existen archivos dentro
         if (archivos != undefined && archivos.length>0){
+            //por cada archivo dentro de la carpeta "files"
             archivos.forEach(Usuario => {
+                //lee la carpeta con el nombre de usuario ubicada en "files"
                 fs.readdir(`./client/files/${Usuario}`,(err,archivosUsuario)=>{    
+                    //si existen archivos dentro de la carpeta anterior
                     if(archivosUsuario != undefined && archivosUsuario.length>0){
-                        archivosUsuario.forEach(Disco => {            
+                        //por cada objeto que se encuentra
+                        archivosUsuario.forEach(Disco => {
+                            //registro los datos recolectados en la lista de objetos "listaDiscos"            
                             listaDiscos.push({
                                 usuario : Usuario,
                                 nombre : Disco
@@ -109,7 +136,7 @@ app.get('/home', (req, res) => {
                     }
                 })
             });
-           
+           //renderizo el handlebars de home con los parametros de usuario, listaDiscos y playlist
             res.render('home',{
                 title: 'Groove And Play - Noticias',
                 usuario: req.session.userId,
@@ -119,29 +146,36 @@ app.get('/home', (req, res) => {
             
         }
         else{
+            //renderizo el handlebars de gallery-NoFile con los parametros de usuario, listaDiscos y playlist
             res.render('gallery-NoFile',{
                 title: 'Groove And Play - No hay discos subidos al servidor',
                 usuario: req.session.userId,
                 listaDiscos: listaDiscos,
-                usuario: req.session.userId,
                 playlist: playlist
             })
         }
     })
 });
 
+// GET /registro
 app.get('/registro', (req, res) => {
+    //renderizo el handlebars de register con el Playlist global como parametro
     res.render('register',{
         title:"Groove And Play - Registrarse",
         playlist: playlist
     })
   });
 
+
+  //POST /signin
   app.post('/signin', upload.single("file"), (req, res) => {
+    //Si el form tiene el campo "user" y "password" rellenados
     if (req.body.user !== undefined && req.body.password !== undefined) {
         console.log(req.file);
+        //lee la carpeta del usuario que se encuentra en "client"
         fs.mkdir(`./client/${req.body.user}`,()=>{
             console.log("cree carpeta "+req.body.user);
+            //espero un segundo y muevo el archivo de la foto de perfil a la carpeta generada del usuario, luego borro el archivo original subido en "client/files"
             setTimeout(() => {
                 fs.createReadStream(`./client/files/`+req.file.filename).pipe(fs.createWriteStream(`./client/${req.body.user}/user.jpg`)); 
                 fs.unlink((`./client/files/`+req.file.filename) , ()=>{
@@ -149,6 +183,7 @@ app.get('/registro', (req, res) => {
                 });
             }, 1000);
         });
+        //llamo a la funcion registrarUsuario perteneciente a "usuarios.js" con los parametros obtenidos del form
         usuarios.registrarUsuario(req.body.user, req.body.password,
           function() {
              
@@ -159,14 +194,14 @@ app.get('/registro', (req, res) => {
             })
           }, function() {
            
-            // Si validó mal, se destruye la sesión (por si la hubiera) y redirige a página inicial
+            // Si validó mal, se renderiza el handlebars de error por usuario y contraseña repetidos
             res.render('signinBAD',{
                 title: "Groove And Play - Error de registro",
                 playlist: playlist
             });
         }, function() {
            
-            // Si validó mal, se destruye la sesión (por si la hubiera) y redirige a página inicial
+            // Si validó mal, se renderiza el handlebars de error por usuario y contraseña vacios
             res.render('signinVacio',{
                 title: "Groove And Play - Error de registro",
                 playlist: playlist
@@ -177,6 +212,7 @@ app.get('/registro', (req, res) => {
 
 });
 
+//GET /logout
 app.get('/logout', (req, res) => {
 
     // Destruyo sesión y redirijo al login.
@@ -187,8 +223,9 @@ app.get('/logout', (req, res) => {
 
 // POST /login
 app.post('/login', (req, res) => {
+    //Si el form tiene el campo "user" y "password" rellenados
     if (req.body.user !== undefined && req.body.password !== undefined) {
-
+        //llamo a la funcion validarUsuario perteneciente a "usuarios.js" con los parametros obtenidos del form
         usuarios.validarUsuario(req.body.user, req.body.password,
           function() {
              
@@ -211,11 +248,16 @@ app.post('/login', (req, res) => {
 
 // GET /subirarchivos decide a donde redirigir segun donde se encuentre el proceso de subida
 app.get('/subirarchivos', (req,res)=>{
+    //si hay una session activa
     if (req.session.userId !== undefined) {
-       
+       //defino un array para determinar donde redireccionar segun el query que se envía al llamarla 
+       //se hace un split al req.query.id para dividir en dos al query,
+       //dondeRedireccionar[0] define a qué parte de la subida redireccionar
+       //dondeRedireccionar[1] define el nombre del disco subido
         let dondeRedireccionar= req.query.id.split('|');
         switch (dondeRedireccionar[0]) {    
             case "contP":
+            //si llega como query "contP" redirecciona a la subida de la contraportada
                 res.render('upload-DiscoContraP',{
                     title: 'Groove And Play - Contraportada del Disco',
                     usuario: req.session.userId,
@@ -224,6 +266,7 @@ app.get('/subirarchivos', (req,res)=>{
                 });
                 break;
             case "audio":
+            //si llega como query "audio" redirecciona a la subida del audio
                 res.render('upload-DiscoAudio',{
                     title: 'Groove And Play - Archivos de audio',
                     usuario: req.session.userId,
@@ -232,6 +275,7 @@ app.get('/subirarchivos', (req,res)=>{
                 });
                 break;
             default:
+                //si llega cualquier otra cosa redirecciona a la subida de la portada
                 res.render('upload-DiscoPortada', {
                     title: 'Groove And Play - Portada del Disco',
                     usuario: req.session.userId,
@@ -253,26 +297,37 @@ app.get('/subirarchivos', (req,res)=>{
 
 // POST /upload Sube los archivos, rellena las carpetas de portada, contraportada o audio segun el estado de la subida
 app.post('/upload', upload.array('file'), (req, res) => {
+    //defino un array para determinar qué carpeta crear segun el query que se envía al llamarla 
+       //se hace un split al req.query.id para dividir en dos al query,
+       //queCrear[0] define qué acabo de subir
+       //queCrear[1] define el nombre del disco subido
     let queCrear = req.query.id.split('|'); 
-   
+   //llama a la funcion crearCarpeta pasandole el array antes creado y el req para acceder al nombre de la session
     crearCarpeta(req,queCrear);
+    //si hay archivos en la cola de subida
     if (req.files != ''){
+        // declaro una lista de objetos vacia (resultados), un array vacio (textoResultado), un boolean (aceptado) y un contador de errores (errors)
         let resultados = [];
         let textoResultado = "";
         let aceptado = false;
         var errors=0;
 
-        for (let x = 0; x <= req.files.length-1; x++) {            
+        //por cada archivo subido
+        for (let x = 0; x <= req.files.length-1; x++) {         
+            //extraigo su extension   
             let extension = (req.files[x].originalname.substring(req.files[x].originalname.lastIndexOf("."))).toLowerCase();
-            
+            //compruebo si la extension anterior coincide con alguno de la lista que declare globalmente
             if(listaExtImg.includes(extension)||listaExtSound.includes(extension)){
+                //si coinciden asigno un mensaje de ok, y le asigno un valor de TRUE a aceptado
                 textoResultado = "Archivo subido OK."
                 aceptado = true;
             }
             else{
+                //si no coinciden, conteo un error, asigno un mensaje de error y establezco un valor de False a aceptado
                 errors++;
                 textoResultado = "Archivo no aceptado (tipo no válido)."
                 aceptado = false;
+                //segun qué haya subido, luego de 2 segundos elimino el archivo subido 
                 switch (queCrear[0]) {
                     case 'port':
                         setTimeout(() => {
@@ -312,16 +367,19 @@ app.post('/upload', upload.array('file'), (req, res) => {
                         break;
                 }
             }
+            //registro los resultados de cada subida
             resultados.push({
                 archivo: req.files[x].originalname,
                 aceptado: aceptado,
                 textoResultado: textoResultado
             });
         }
+        // verifico los errores con la funcion verificarErroresAlSubirArchivo
         verificarErroresAlSubirArchivo(errors,queCrear,req,res,resultados);
     }
     else{
-       
+       //si estoy parado en la subida de la portada, renderizo el error con el handlebars de upload-NoFile pasandole como parametro 
+       //la redireccion, el disco(usando el dato obtenido del body), el usuario y el playlist
         if(queCrear[0]=='port'){
             res.render(`upload-NoFile`, {
                 title: 'Groove And Play - No se seleccionaron archivos',
@@ -331,6 +389,8 @@ app.post('/upload', upload.array('file'), (req, res) => {
                 playlist: playlist
             })
         }else{
+        //si estoy parado en la subida de la portada, renderizo el error con el handlebars de upload-NoFile pasandole como parametro 
+       //la redireccion, el disco(usando el dato obtenido de la query), el usuario y el playlist
             res.render(`upload-NoFile`, {
                 title: 'Groove And Play - No se seleccionaron archivos',
                 redireccion: queCrear[0],
