@@ -76,5 +76,36 @@ function registrarUsuario(user, password, cbOK, cbErr,cbVacio) {
     })
 }
 
+function currentTimeAudioStore(sessionID){
+  MongoClient.connect(dbURL, (err, client) => {
+      const db = client.db("testdb");
+
+      const collUser = db.collection("users");
+
+      if(sessionID != undefined || sessionID != ''){
+        collUser.find( {username: user}).toArray((err, data) => {
+          if (data.length == 1) {
+    
+            collUser.insert({
+              username : user,
+              password : password
+            })
+            cbOK();
+
+            client.close()
+          } else {
+    
+    
+            cbErr();
+            client.close()
+          }
+        })
+      }else{
+        cbVacio();
+        client.close()
+      }
+  })
+}
+
 module.exports.validarUsuario = validarUsuario;
 module.exports.registrarUsuario = registrarUsuario;

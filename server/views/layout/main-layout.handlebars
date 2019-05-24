@@ -15,15 +15,20 @@
     <button class = "button-nav" id="gallery" onclick="window.location.href = '/seeGallery'">Galería de Discos</button><br>
     <button class = "button-nav" id="upload" onclick="window.location.href = '/subirarchivos?id=0|0'">Subir Discos</button><br>
     <button class = "button-nav" id="logout" onclick="window.location.href = '/logout'">Log Out</button>
-    <h3 class= "contenedor-reproductor" style="font-family: 'Indie Flower', cursive;margin-bottom:70px;width: 111px;height:100px;background:none;color:rgb(158, 140, 80)" >Groove And Play</h3>
-    <img class= "contenedor-reproductor" style="width: 111px;height:100px;background:none" src="../img/logo.png"></nav>
+    <div class="logo">
+        <img style="width: 70px;height:67px;background:none;" src="../img/logo.png">
+        <h3 style="font-family: 'Indie Flower', cursive;width: 111px;height:100px;background:none;color:rgb(158, 140, 80)" >Groove And Play</h3>
+    </div>
+    </nav>
 {{else}}
     <button class = "button-nav" id="home" onclick="window.location.href = '/home'">Home</button><br>
     <button class = "button-nav" id="login" onclick="window.location.href = '/'">Log In</button><br>
     <button class = "button-nav" id="signin" onclick="window.location.href = '/registro'">Sign In</button>
-    
-    <img class= "contenedor-reproductor" style="width: 111px;height:100px;background:none;" src="../img/logo.png">
-    <h3 class= "contenedor-reproductor" style="font-family: 'Indie Flower', cursive;margin-bottom:70px;width: 111px;height:100px;background:none;color:rgb(158, 140, 80)" >Groove And Play</h3></nav>
+    <div class="logo">
+        <img style="width: 70px;height:70px;background:none;" class="logo-img" src="../img/logo.png">
+        <h3 style="font-family: 'Indie Flower', cursive;width: 111px;height:100px;background:none;color:rgb(158, 140, 80)" >Groove And Play</h3>
+    </div>
+    </nav>
 {{/if}}
 {{{body}}}
 <div class="contenedor-reproductor">
@@ -32,17 +37,36 @@
     {{#each playlist}}
         <!-- por cada elemento de playlist Creo un DIV oculto para guardar la url del mismo que tambien paso por el metodo GET de /-->
         <div id="url-audio-{{@index}}" style="display:none">{{this.url}}</div>
+        <div id="usuario-audio-{{@index}}" style="display:none">{{this.usuario}}</div>
+        <div id="disco-audio-{{@index}}" style="display:none">{{this.disco}}</div>
+        <div id="nombre-audio-{{@index}}" style="display:none">{{this.tema}}</div>
     {{/each}}
     <audio class="reproductor-main" id="reproductor-pers"></audio>
     <div>
-        <img class="boton-contenedor-tercero" id="playpausebutton" onclick="replay(this,'reproductor-pers')"  style="display:inline-flex; width: 50px; height:50px;" src="../img/replay.png">
-        <img class="boton-contenedor-secundario" id="playpausebutton" onclick="stop(this,'reproductor-pers')"  style="display:inline-flex; width: 75px; height:75px;" src="../img/stop.png">
+        <div class="barraCurrent"><h5 class= "current-time" id="currentTime">00:00 </h5><input type="range" id="seek" value="0" max=""/></div><br>
+        <div class="identificador-animado">
+            <div id="identificador"></div>
+        </div>
+        
+    </div>
+    
+    
+    <div>
+        <img class="boton-contenedor-tercero" id="replaybutton" onclick="replay(this,'reproductor-pers')"  style="display:inline-flex; width: 50px; height:50px;" src="../img/replay.png">
+        <img class="boton-contenedor-secundario" id="stopbutton" onclick="stop(this,'reproductor-pers')"  style="display:inline-flex; width: 75px; height:75px;" src="../img/stop.png">
         <img class="boton-contenedor-primario" id="playbutton" onclick="playPause(this,'reproductor-pers')"  style="display:inline-flex; width: 100px; height:100px;" src="../img/play.png">
-        <img class="boton-contenedor-secundario" id="playpausebutton" onclick="next('reproductor-pers')"  style="display:inline-flex; width: 75px; height:75px;" src="../img/next.png">
-        <img class="boton-contenedor-tercero" id="playpausebutton" onclick="mute(this,'reproductor-pers')"  style="display:inline-flex; width: 50px; height:50px;" src="../img/speaker.png">
+        <img class="boton-contenedor-secundario" id="nextbutton" onclick="next('reproductor-pers')"  style="display:inline-flex; width: 75px; height:75px;" src="../img/next.png">
+        <div class="boton-contenedor-mute">
+            <img id="mutebutton" class="mute-button" onclick="mute(this,'reproductor-pers')"  style="width: 50px; height:50px;" src="../img/speaker.png">
+            
+            <input type="range" class="range-volume" id="volume" value="100" max="100"/>
+            
+        </div>
+        
     </div>
 </div>
 <script>
+
     //tomo el div que tiene le length de playlist en el innerHTML
     var divLength = document.getElementById("playlist-length")
     //lo parseo a INT para poder usarlo
@@ -51,17 +75,48 @@
     //gracias al length de playlist que guardé antes*" y tomo el url que tiene en su innerHTML
     var numPlay = 0;
     var url = document.getElementById(`url-audio-${numPlay}`).innerHTML;
+    var usuario = document.getElementById(`usuario-audio-${numPlay}`).innerHTML;
+    var disco = document.getElementById(`disco-audio-${numPlay}`).innerHTML;
+    var nombre = document.getElementById(`nombre-audio-${numPlay}`).innerHTML;
+    var rangoVolume = document.getElementById("volume");
     //tomo el reproductor por su id
     var reproductor = document.getElementById("reproductor-pers");
+    var identificador = document.getElementById("identificador");
+    var barraDespla = document.getElementById("seek");
+    var textoID = document.createElement("h5");
+    textoID.setAttribute("class","identificador-texto");
+    textoID.innerHTML = `${usuario} - ${disco} - ${nombre}`;
+    identificador.appendChild(textoID);
     //cambio el source del reproductor por el url que tome dos pasos antes
     reproductor.src = url;
+    setTimeout(function(){
+        barraDespla.max = reproductor.duration;
+    },500)
+    rangoVolume.addEventListener("input", function(){
+        let valor = (this.value)/100;
+        reproductor.volume = valor;
+    })
+    barraDespla.addEventListener("input", function() {
+		reproductor.currentTime = this.value;
+	});
+    reproductor.addEventListener("timeupdate",function(ev){	  
+        document.getElementById("currentTime").innerHTML = hora(reproductor.currentTime); 
+        let curtime = parseInt(reproductor.currentTime, 10);
+		barraDespla.value = curtime; 
+    },true);
 
+    function hora(segundos){
+        var d=new Date(segundos*1000);
+        var minuto = (d.getMinutes()<10)?"0"+d.getMinutes():d.getMinutes();
+        var segundo = (d.getSeconds()<10)?"0"+d.getSeconds():d.getSeconds();
+        return minuto+":"+segundo;
+    }
 
     function playPause(btn,aud){
         var audio= document.getElementById(aud);
+        
         if(audio.paused){
             audio.play();
-            durationAudio = parseInt(audio.duration) * 1000;
             btn.src ="../img/pause.png";
             if (audio.loop == false){
                 audio.addEventListener("ended",()=>{
@@ -78,11 +133,14 @@
 
     function mute(btn,aud){
         var aud= document.getElementById(aud);
+        var vol = document.getElementById("volume");
         if(aud.volume == 0){
             aud.volume = 1;
+            vol.value = 100;
             btn.src ="../img/speaker.png";
         }else{
             aud.volume = 0;
+            vol.value = 0;
             btn.src ="../img/mute.png";
         }
     }
@@ -110,6 +168,7 @@
 
     function next(aud){
         //vuelvo a tomar todo (sino no funciona, no se por qué)
+        var btn = document.getElementById("playbutton")
         var repro= document.getElementById(aud);
         var divLength = document.getElementById("playlist-length")
         var lengthPlaylist = parseInt(divLength.innerHTML);
@@ -119,9 +178,23 @@
         }else{
             numPlay++;
         }
+        var usuario = document.getElementById(`usuario-audio-${numPlay}`).innerHTML;
+        var disco = document.getElementById(`disco-audio-${numPlay}`).innerHTML;
+        var nombre = document.getElementById(`nombre-audio-${numPlay}`).innerHTML;
+        var identificador = document.getElementById("identificador");
+        identificador.innerHTML = '';
         
+        var textoID = document.createElement("h5");
+        
+        textoID.setAttribute("class","identificador-texto");
+        textoID.innerHTML = `${usuario} - ${disco} - ${nombre}`;
+        identificador.appendChild(textoID);
+
         repro.src = document.getElementById(`url-audio-${numPlay}`).innerHTML;
-        repro.play();
+        setTimeout(function(){
+            barraDespla.max = repro.duration;
+        },500)
+        playPause(btn,aud)
 
     }
 
