@@ -3,26 +3,100 @@
         width: 110%;
     }
 </style>
-<div class="div-contenedor-galeria">
-    <div>
-        <h1>Portada</h1>
-        {{#if fotosPortada}}
-            {{{fotosPortada}}}
-        {{/if}}
-        {{#else}}
-            El disco no posee portada
-        {{/else}}
-    
-    </div>
-    <div>
-        <h1>Contraportada</h1>
-        {{{fotosContraportada}}}
+<div class="slider" id="sliderNoticia">
+    <ul>
+        <li>
+            <div class="div-portada" id="divPortada">
+                <h1>Portada</h1><br>
+                {{#if fotosPortada}}
+                    {{{fotosPortada}}}
+                    <button class="boton-borrar-todo" onclick="window.location.href = '/remove?id={{carpeta}}|all|all'">Borrar todo</button>
+                {{/if}}
+                {{#else}}
+                    El disco no posee portada
+                {{/else}}
+            </div>
+            <img class="flecha" id="flechaIzquierda" src="../img/left.png">
+            <img class="flecha" id="flechaDerecha" src="../img/right.png">
+        </li>
+        <li>
+            <div class="div-noticia" id="divContraportada">
+                <h1>Contraportada</h1>
+                {{{fotosContraportada}}}
 
-    </div>
-    <div>
-        <h1>Tracklist</h1>
-        {{{audio}}}
-
-    </div>
-    <button onclick="window.location.href = '/remove?id={{carpeta}}|all|all'">Borrar todo</button>
+            </div>
+        </li>
+        <li>
+            <div class="div-noticia" id="divTracklist">
+                <h1>Tracklist</h1>
+                {{{audio}}}
+            </div>
+        </li>
+    </ul>
 </div>
+<script>
+    var flechaDerecha = document.getElementById("flechaDerecha");
+    var flechaIzquierda = document.getElementById("flechaIzquierda");
+    var click=0;
+
+    flechaDerecha.addEventListener("click", function(){
+        switch(click){
+            case 0 : 
+                flechaIzquierda.style.display = "flex";
+                siguiente("divPortada","divContraportada","-200%");
+                click++;
+                break;
+            case 1 : 
+                flechaIzquierda.style.display = "flex";
+                flechaDerecha.style.display = "none";
+                siguiente("divContraportada","divTracklist","-400%");
+                click++;
+                break;       
+        }
+    })
+
+    flechaIzquierda.addEventListener("click", function(){
+        switch(click){
+            case 2 : 
+                flechaDerecha.style.display = "flex";
+                anterior("divTracklist","divContraportada","-200%");
+                click--;
+                break;
+            case 1 : 
+                flechaDerecha.style.display = "flex";
+                flechaIzquierda.style.display = "none";
+                anterior("divContraportada","divPortada","0%");
+                click--;
+                break;       
+        }
+    })
+
+    function siguiente(actual,siguiente,porcentaje){
+        var divPortada = document.getElementById(actual);
+        var divNoticia = document.getElementById(siguiente);
+        var divSlider = document.getElementById("sliderNoticia");
+        divPortada.style.opacity=0;
+        divNoticia.style.opacity=100;
+        divNoticia.style.marginLeft = porcentaje;
+        if (siguiente == "divTracklist"){
+            divSlider.style.overflowY = "scroll";
+        }else{
+            divSlider.style.overflowY = "hidden";
+        }
+    }
+
+    function anterior(actual,siguiente,porcentaje){
+        var divPortada = document.getElementById(actual);
+        var divNoticia = document.getElementById(siguiente);
+        var divSlider = document.getElementById("sliderNoticia");
+        divPortada.style.opacity=0;
+        divNoticia.style.opacity=100;
+        divNoticia.style.marginLeft = porcentaje;
+        if (siguiente == "divTracklist"){
+            divSlider.style.overflowY = "scroll";
+        }else{
+            divSlider.style.overflowY = "hidden";
+        }
+    }
+
+</script>

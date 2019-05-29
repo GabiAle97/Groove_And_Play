@@ -7,16 +7,25 @@
     <style>@import url('https://fonts.googleapis.com/css?family=Noto+Sans+JP:100,300,400,500,700,900');</style>
     <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
 </head>
+<nav class="nav-derecha">
+    <p class="saludo" style="color: rgb(158, 140, 80)">Tracklist</p>
+
+    
+    {{#each playlist}}
+        <button class = "button-nav" id="Track-{{@index}}" onclick="jump('reproductor-pers',{{@index}})">{{this.disco}} - {{this.tema}}</button><br>
+    {{/each}}
+
+</nav>
 <nav>
 {{#if usuario}}
     <img class= "img-usuario" src="../{{usuario}}/user.jpg">
-    <p class="saludo">Bienvenido<br><i style="color: rgb(158, 140, 80)">{{usuario}}</i></p>
+    <p class="saludo" style="color: rgb(158, 140, 80)">Bienvenido<br><i style="color: rgb(158, 140, 80)">{{usuario}}</i></p>
     <button class = "button-nav" id="home" onclick="window.location.href = '/home'">Home</button><br>
     <button class = "button-nav" id="gallery" onclick="window.location.href = '/seeGallery'">Galería de Discos</button><br>
     <button class = "button-nav" id="upload" onclick="window.location.href = '/subirarchivos?id=0|0'">Subir Discos</button><br>
     <button class = "button-nav" id="logout" onclick="window.location.href = '/logout'">Log Out</button>
     <div class="logo">
-        <img style="width: 70px;height:67px;background:none;" src="../img/logo.png">
+        <img style="width: 70px;height:70px;background:none;" class="logo-img" id="imgLogo" src="../img/logo.png">
         <h3 style="font-family: 'Indie Flower', cursive;width: 111px;height:100px;background:none;color:rgb(158, 140, 80)" >Groove And Play</h3>
     </div>
     </nav>
@@ -25,7 +34,7 @@
     <button class = "button-nav" id="login" onclick="window.location.href = '/'">Log In</button><br>
     <button class = "button-nav" id="signin" onclick="window.location.href = '/registro'">Sign In</button>
     <div class="logo">
-        <img style="width: 70px;height:70px;background:none;" class="logo-img" src="../img/logo.png">
+        <img style="width: 70px;height:70px;background:none;" class="logo-img" id="imgLogo" src="../img/logo.png">
         <h3 style="font-family: 'Indie Flower', cursive;width: 111px;height:100px;background:none;color:rgb(158, 140, 80)" >Groove And Play</h3>
     </div>
     </nav>
@@ -42,7 +51,8 @@
         <div id="nombre-audio-{{@index}}" style="display:none">{{this.tema}}</div>
     {{/each}}
     <audio class="reproductor-main" id="reproductor-pers"></audio>
-    <div>
+    <div id="timeStorage" style="display:none">{{currentTime}}</div>
+    <div class="divId">
         <div class="barraCurrent"><h5 class= "current-time" id="currentTime">00:00 </h5><input type="range" id="seek" value="0" max=""/></div><br>
         <div class="identificador-animado">
             <div id="identificador"></div>
@@ -99,7 +109,7 @@
     barraDespla.addEventListener("input", function() {
 		reproductor.currentTime = this.value;
 	});
-    reproductor.addEventListener("timeupdate",function(ev){	  
+    reproductor.addEventListener("timeupdate",function(){	  
         document.getElementById("currentTime").innerHTML = hora(reproductor.currentTime); 
         let curtime = parseInt(reproductor.currentTime, 10);
 		barraDespla.value = curtime; 
@@ -114,9 +124,10 @@
 
     function playPause(btn,aud){
         var audio= document.getElementById(aud);
-        
+        var logo = document.getElementById("imgLogo");
         if(audio.paused){
             audio.play();
+            logo.style.animationPlayState = "running";
             btn.src ="../img/pause.png";
             if (audio.loop == false){
                 audio.addEventListener("ended",()=>{
@@ -127,6 +138,7 @@
 
         }else{
             audio.pause();
+            logo.style.animationPlayState = "paused";
             btn.src ="../img/play.png";
         }
     }
@@ -178,6 +190,30 @@
         }else{
             numPlay++;
         }
+        var usuario = document.getElementById(`usuario-audio-${numPlay}`).innerHTML;
+        var disco = document.getElementById(`disco-audio-${numPlay}`).innerHTML;
+        var nombre = document.getElementById(`nombre-audio-${numPlay}`).innerHTML;
+        var identificador = document.getElementById("identificador");
+        identificador.innerHTML = '';
+        
+        var textoID = document.createElement("h5");
+        
+        textoID.setAttribute("class","identificador-texto");
+        textoID.innerHTML = `${usuario} - ${disco} - ${nombre}`;
+        identificador.appendChild(textoID);
+
+        repro.src = document.getElementById(`url-audio-${numPlay}`).innerHTML;
+        setTimeout(function(){
+            barraDespla.max = repro.duration;
+        },500)
+        playPause(btn,aud)
+
+    }
+
+    function jump(aud,index){
+        numPlay = index;
+        var btn = document.getElementById("playbutton")
+        var repro= document.getElementById(aud);
         var usuario = document.getElementById(`usuario-audio-${numPlay}`).innerHTML;
         var disco = document.getElementById(`disco-audio-${numPlay}`).innerHTML;
         var nombre = document.getElementById(`nombre-audio-${numPlay}`).innerHTML;
