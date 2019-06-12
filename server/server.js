@@ -294,7 +294,7 @@ app.get('/subirarchivos', (req, res) => {
     } else {
 
 
-        // Si mi usuarix tipeó "localhost:3000/home" en la barra de direcciones del navegador y
+        // Si mi usuario tipeó "localhost:3000/subirarchivos" en la barra de direcciones del navegador y
         // no tenía una sesión activa, lo redirijo a la página que tiene el login.
         res.redirect("/");
 
@@ -335,35 +335,38 @@ app.post('/upload', upload.array('file'), (req, res) => {
                 aceptado = false;
                 //segun qué haya subido, luego de 2 segundos elimino el archivo subido 
                 switch (queCrear[0]) {
+                    //en caso de error al subir una portada
                     case 'port':
                         setTimeout(() => {
                             fs.unlink(('./client/files/' + req.session.userId + '/' + req.body.nombreDisco + '/portada/' + `portada-${req.body.nombreDisco}.jpg`), function(err) {
                                 if (err) {
-
+                                    console.log(`error al borrar portada-${req.body.nombreDisco}.jpg`);
                                 } else {
-
+                                    console.log(`portada-${req.body.nombreDisco}.jpg borrado con éxito`);
                                 }
                             });
                         }, 2000);
                         break;
+                        //en caso de error al subir una contraportada
                     case 'contP':
                         setTimeout(() => {
                             fs.unlink(('./client/files/' + req.session.userId + '/' + queCrear[1] + '/contraportada/' + `contraportada-${queCrear[1]}.jpg`), function(err) {
                                 if (err) {
-
+                                    console.log(`error al borrar contraportada-${queCrear[1]}.jpg `);
                                 } else {
-
+                                    console.log(`contraportada-${queCrear[1]}.jpg borrado con éxito`);
                                 }
                             });
                         }, 2000);
                         break;
+                        //en caso de error al subir un archivo de audio
                     case 'audio':
                         setTimeout(() => {
                             fs.unlink(('./client/files/' + req.session.userId + '/' + queCrear[1] + '/audio/' + `track${x}-${req.files[x].originalname}`), function(err) {
                                 if (err) {
-
+                                    console.log(`error al borrar track${x}-${req.files[x].originalname}`);
                                 } else {
-
+                                    console.log(`track${x}-${req.files[x].originalname} borrado con éxito`);
                                 }
                             });
                         }, 2000);
@@ -407,32 +410,39 @@ app.post('/upload', upload.array('file'), (req, res) => {
     }
 })
 
-// GET /seeGallery
+// GET /seeGallery (para ver cada disco subido por el usuario)
 app.get('/seeGallery', (req, res) => {
+    //si existe una sesion iniciada...
     if (req.session.userId !== undefined) {
-
-        listaDiscos = []
+        //se borra lo que contiene el array de discos para no repetir datos ya existentes guardados en acciones anteriores
+        listaDiscos = [];
+        //realizo una lectura de la carpeta correspondiente al usuario que tiene la sesion iniciada
         fs.readdir(`./client/files/${req.session.userId}`, (err, archivos) => {
+            //si hay archivos dentro de esa carpeta
             if (archivos != undefined && archivos.length > 0) {
+                //por cada elemento leido de dicha carpeta
                 archivos.forEach(element => {
+                    //se pushea el elemento al array "listaDiscos" junto al usuario que le corresponde
                     listaDiscos.push({
                         nombre: element,
                         usuario: req.session.userId
                     });
                 });
+                /*se renderiza el handlebars de gallery con los datos del usuario, 
+                el array "listaDiscos" con los datos recolectados una vez concluido el forEach y el array global "playlist"*/
                 res.render('gallery', {
                     title: 'Groove And Play - Archivos',
                     usuario: req.session.userId,
                     listaDiscos: listaDiscos,
-                    usuario: req.session.userId,
                     playlist: playlist
                 })
             } else {
+                /*En caso de no encontrar datos dentro de la carpeta del usuario,
+                se renderiza el handlebars de gallery con los datos del usuario, el array "listaDiscos" vacio y el array global "playlist"*/
                 res.render('gallery-NoFile', {
                     title: 'Groove And Play - No hay discos subidos al servidor',
                     usuario: req.session.userId,
                     listaDiscos: listaDiscos,
-                    usuario: req.session.userId,
                     playlist: playlist
                 })
             }
@@ -441,7 +451,7 @@ app.get('/seeGallery', (req, res) => {
     } else {
 
 
-        // Si mi usuarix tipeó "localhost:3000/home" en la barra de direcciones del navegador y
+        // Si mi usuario tipeó "localhost:3000/seeGallery" en la barra de direcciones del navegador y
         // no tenía una sesión activa, lo redirijo a la página que tiene el login.
         res.redirect("/");
 
@@ -449,70 +459,105 @@ app.get('/seeGallery', (req, res) => {
 
 })
 
+//GET /notices (para mostrar un disco en especifico)
+
 app.get('/notices', (req, res) => {
+    //Tomo el query de la llamada realizada por el usuario y la divido con la funcion "split" para definir el usuario (queLeer[1])
+    // y el nombre del disco (queLeer[0]) que quiero mostrar
     let queLeer = req.query.id.split('|')
+        //defino lo que voy a mostrar primero, que siempre va a ser la portada del disco
     var carpeta = 'port';
+    //defino un array vacio donde guardaré cada portada encontrada (por el momento siempre será una sola portada)
     var fotosPortada = '';
+    //defino un array vacio donde guardaré cada contraportada encontrada (por el momento siempre será una sola contraportada)
     var fotosContraportada = '';
+    //defino un array vacio donde guardaré cada archivo de audio encontrado
     var audio = '';
+    //mientras "carpeta" sea igual a cualquiera de las opciones a mostrar (portada, contraportada, audio) o a "full", que quiere decir
+    //que terminé de recolectar información
     while (carpeta == 'port' || carpeta == 'contP' || carpeta == 'audio' || carpeta == 'full') {
-
+        //realizo un switch por cada opcion posible
         switch (carpeta) {
+            //en caso de buscar la portada
             case 'port':
-
+                //realizo una lectura de la carpeta "portada" del disco (queLeer[0]) perteneciente al usuario definido (queLeer[1])
                 fs.readdir(`./client/files/${queLeer[1]}/${queLeer[0]}/portada`, (err, archivos) => {
-                    if (archivos.length > 0) {
-                        for (let x = 0; x < archivos.length; x++) {
-                            fotosPortada += `<img src="../files/${queLeer[1]}/${queLeer[0]}/portada/${archivos[x]}"></img>
+                        //si existen archivos dentro de dicha carpeta...
+                        if (archivos.length > 0) {
+                            //por cada archivo encontrado (en este caso siempre será uno)...
+                            for (let x = 0; x < archivos.length; x++) {
+                                //se sumariza el codigo HTML que representa la imagen a mostrar en el HTML final al array vacio "fotosPortada"
+                                fotosPortada += `<img src="../files/${queLeer[1]}/${queLeer[0]}/portada/${archivos[x]}"></img>
                                 
                                 <br>
                                    <br>
                                 `;
+                            }
+                        } else {
+                            //si no existen archivos, se le asigna una notificacion de error al array vacío "fotosPortada" para mostrar 
+                            //luego en el HTML final
+                            fotosPortada = "El disco no posee portada aún";
                         }
-                    } else {
-                        fotosPortada = "El disco no posee portada aún";
-                    }
-                })
+                    })
+                    //le asigno lo siguiente que quiero mostrar a la variable "carpeta", cambiando de caso en el switch
                 carpeta = 'contP';
                 break;
+                //en caso de buscar la contraportada
             case 'contP':
-
+                //realizo una lectura de la carpeta "contraportada" del disco (queLeer[0]) perteneciente al usuario definido (queLeer[1])
                 fs.readdir(`./client/files/${queLeer[1]}/${queLeer[0]}/contraportada`, (err, archivos) => {
-                    if (archivos.length > 0) {
-                        for (let x = 0; x < archivos.length; x++) {
-                            fotosContraportada += `<img src="../files/${queLeer[1]}/${queLeer[0]}/contraportada/${archivos[x]}"></img>
+                        //si existen archivos dentro de dicha carpeta...
+                        if (archivos.length > 0) {
+                            //por cada archivo encontrado (en este caso siempre será uno)...
+                            for (let x = 0; x < archivos.length; x++) {
+                                //se sumariza el codigo HTML que representa la imagen 
+                                //a mostrar en el HTML final al array vacio "fotosContraportada"
+                                fotosContraportada += `<img src="../files/${queLeer[1]}/${queLeer[0]}/contraportada/${archivos[x]}"></img>
                                 
                                 <br>
                                    <br>
                                 `;
+                            }
+                        } else {
+                            //si no existen archivos, se le asigna una notificacion de error al array vacío "fotosContraportada" para mostrar 
+                            //luego en el HTML final
+                            fotosContraportada = "El disco no posee contraportada aún";
                         }
-                    } else {
-                        fotosContraportada = "El disco no posee contraportada aún";
-                    }
-                })
+                    })
+                    //le asigno lo siguiente que quiero mostrar a la variable "carpeta", cambiando de caso en el switch
                 carpeta = 'audio';
                 break;
+                //en caso de buscar audios
             case 'audio':
-
+                //realizo una lectura de la carpeta "audio" del disco (queLeer[0]) perteneciente al usuario definido (queLeer[1])
                 fs.readdir(`./client/files/${queLeer[1]}/${queLeer[0]}/audio`, (err, archivos) => {
-                    if (archivos.length > 0) {
-                        for (let x = 0; x < archivos.length; x++) {
-                            audio += `<audio controls src="../files/${queLeer[1]}/${queLeer[0]}/audio/${archivos[x]}"></audio>${archivos[x]}
+                        //si existen archivos dentro de dicha carpeta...
+                        if (archivos.length > 0) {
+                            //por cada archivo encontrado...
+                            for (let x = 0; x < archivos.length; x++) {
+                                //se sumariza el codigo HTML que representa el archivo de audio
+                                //a mostrar en el HTML final al array vacio "audio"
+                                audio += `<audio controls src="../files/${queLeer[1]}/${queLeer[0]}/audio/${archivos[x]}"></audio>${archivos[x]}
                                 
                                 <br>
                                    <br>
                                 `;
-                        }
+                            }
 
-                    } else {
-                        audio = "El disco no posee Tracklist aún";
-                    }
-                })
+                        } else {
+                            //si no existen archivos, se le asigna una notificacion de error al array vacío "audio" para mostrar 
+                            //luego en el HTML final
+                            audio = "El disco no posee Tracklist aún";
+                        }
+                    })
+                    //le asigno la palabra "full" a la variable "carpeta", cambiando de caso en el switch
                 carpeta = 'full';
                 break;
+                //en caso de buscar audios
             case 'full':
-
+                //luego de 2 segundos, dandole tiempo al script a rellenar cada array...
                 setTimeout(() => {
+                    //renderizo el handlebars "home-General" con cada array ya completo, el nombre del usuario y el array global "playlist"
                     res.render('home-General', {
                         title: `Groove And Play - ${queLeer[1]} - ${queLeer[0]}`,
                         fotosPortada: fotosPortada,
@@ -523,13 +568,14 @@ app.get('/notices', (req, res) => {
                     })
 
                 }, 2000);
+                //vacío la variable "carpeta" para cortar con el loop generado en el while
                 carpeta = '';
         }
     }
 
 });
 
-
+//GET /gallery (para mostrar todos los discos subidos al servidor)
 app.get('/gallery', (req, res) => {
 
     var carpeta = 'port';

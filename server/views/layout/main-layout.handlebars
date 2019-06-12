@@ -229,8 +229,9 @@
         repro.src = document.getElementById(`url-audio-${numPlay}`).innerHTML;
         setTimeout(function(){
             barraDespla.max = repro.duration;
+            playPause(btn,aud)
         },500)
-        playPause(btn,aud)
+        
 
     }
 

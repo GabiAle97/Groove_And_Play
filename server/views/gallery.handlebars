@@ -1,14 +1,33 @@
 <style>
-    #gallery{
+  #gallery{
         width: 110%;
     }
 </style>
 <div class="contenedor-noticias">
-{{#each listaDiscos}}
-    <div class="div-noticias" onclick="window.location.href='/gallery/?id={{this.nombre}}'">
-        <h4><i style="color: rgb(158, 140, 80)">acabas de subir un disco!</i></h4>
-        <img class="img-noticias" src="./files/{{this.usuario}}/{{this.nombre}}/portada/portada-{{this.nombre}}.jpg">
-        <h2>{{this.nombre}}</h2>
+  {{#each listaDiscos}}
+    <div
+      class="div-noticias"
+      onclick="window.location.href='/gallery/?id={{this.nombre}}'"
+    >
+      <h4>
+        <i style="color: rgb(158, 140, 80)">
+          acabas de subir un disco!
+        </i>
+      </h4>
+      <img
+        class="img-noticias"
+        src="./files/
+          {{this.usuario}}
+          /
+          {{this.nombre}}
+          /portada/portada-
+          {{this.nombre}}
+          .jpg"
+       />
+
+      <h2>
+        {{this.nombre}}
+      </h2>
     </div>
-{{/each}}
+  {{/each}}
 </div>

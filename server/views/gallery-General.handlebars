@@ -1,41 +1,50 @@
 <style>
-    #gallery{
+  #gallery{
         width: 110%;
     }
 </style>
 <div class="slider" id="sliderNoticia">
-    <ul>
-        <li>
-            <div class="div-portada" id="divPortada">
-                <h1>Portada</h1><br>
-                {{#if fotosPortada}}
-                    {{{fotosPortada}}}
-                    <button class="boton-borrar-todo" onclick="window.location.href = '/remove?id={{carpeta}}|all|all'">Borrar todo</button>
-                {{/if}}
-                {{#else}}
-                    El disco no posee portada
-                {{/else}}
-            </div>
-            <img class="flecha" id="flechaIzquierda" src="../img/left.png">
-            <img class="flecha" id="flechaDerecha" src="../img/right.png">
-        </li>
-        <li>
-            <div class="div-noticia" id="divContraportada">
-                <h1>Contraportada</h1>
-                {{{fotosContraportada}}}
-
-            </div>
-        </li>
-        <li>
-            <div class="div-noticia" id="divTracklist">
-                <h1>Tracklist</h1>
-                {{{audio}}}
-            </div>
-        </li>
-    </ul>
+  <ul>
+    <li>
+      <div class="div-portada" id="divPortada">
+        <h1>
+          Portada
+        </h1>
+        <br />
+        {{#if fotosPortada}}
+          {{{fotosPortada}}}
+          <button
+            class="boton-borrar-todo"
+            onclick="window.location.href = '/remove?id={{carpeta}}|all|all'"
+          >
+            Borrar todo
+          </button>
+        {{/if}}
+        {{#else}}El disco no posee portada{{/else}}
+      </div>
+      <img class="flecha" id="flechaIzquierda" src="../img/left.png" />
+      <img class="flecha" id="flechaDerecha" src="../img/right.png" />
+    </li>
+    <li>
+      <div class="div-noticia" id="divContraportada">
+        <h1>
+          Contraportada
+        </h1>
+        {{{fotosContraportada}}}
+      </div>
+    </li>
+    <li>
+      <div class="div-noticia" id="divTracklist">
+        <h1>
+          Tracklist
+        </h1>
+        {{{audio}}}
+      </div>
+    </li>
+  </ul>
 </div>
 <script>
-    var flechaDerecha = document.getElementById("flechaDerecha");
+  var flechaDerecha = document.getElementById("flechaDerecha");
     var flechaIzquierda = document.getElementById("flechaIzquierda");
     var click=0;
 
@@ -98,5 +107,4 @@
             divSlider.style.overflowY = "hidden";
         }
     }
-
 </script>

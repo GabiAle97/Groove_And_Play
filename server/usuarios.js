@@ -1,37 +1,35 @@
+// Variables necesarias para utilizar MongoDB
 const mongodb = require("mongodb");
 const MongoClient = mongodb.MongoClient;
-
 const dbURL = "mongodb://localhost:27017"
 
 /**
- * Valida usuario y clave
+ * Valida usuario y clave al hacer login
  * 
- * @param {string} user Usuario
- * @param {string} password Clave
+ * 
+ * @param {string} user 
+ * @param {string} password 
+ * @param {function} cbOK 
+ * @param {function} cbErr 
  */
 function validarUsuario(user, password, cbOK, cbErr) {
-
-    // Se conecta al motor de base de datos
+    //conección de la base de datos en MongoDB
     MongoClient.connect(dbURL, (err, client) => {
-
-        // Trae referencia a la base
+        //definición del nombre de la base de datos a utilizar
         const db = client.db("testdb");
-
-        // Trae referencia a la colección
+        //definición del nombre de la coleccion a utilizar
         const collUser = db.collection("users");
-
-        // Busca todos los documentos en la colección que coincidan con el criterio
-        // de username y password enviado.
+        //Busco dentro de la coleccion las coincidencias de username y password con los datos que el usuario ingresó
         collUser.find({ username: user, password: password }).toArray((err, data) => {
             if (data.length == 1) {
-                // Si encontró un solo registro con ese usuario y clave, invoco al callback de éxito
+                //Si hay una y solo una coincidencia, se llama a la funcion cbOK 
+                //(callback de la función a realizar en caso de un ingreso correcto)
                 cbOK();
             } else {
-                // Si no encontró ninguno o encontró más de uno (que solo sería posible si tengo algún
-                // usuario duplicado por error, pero ya que estamos), llamo al callback de error
+                //Si no hay coincidencias, o hay mas de una, se dispara el callback de error en el inicio de sesion
                 cbErr();
             }
-
+            //Cierra la conexion con la base de datos
             client.close();
         })
 
@@ -40,69 +38,56 @@ function validarUsuario(user, password, cbOK, cbErr) {
 
 }
 
+/**
+ * 
+ * Registra usuarios nuevos en la Base de Datos
+ * 
+ * @param {string} user 
+ * @param {string} password 
+ * @param {function} cbOK 
+ * @param {function} cbErr 
+ * @param {function} cbVacio 
+ */
+
 function registrarUsuario(user, password, cbOK, cbErr, cbVacio) {
+    //Conección con la base de datos de MongoDB
     MongoClient.connect(dbURL, (err, client) => {
-
-        // Trae referencia a la base
+        //definición del nombre de la base de datos
         const db = client.db("testdb");
-
-        // Trae referencia a la colección
+        //definicion del nombre de la colección a utilizar
         const collUser = db.collection("users");
-
-        // Busca todos los documentos en la colección que coincidan con el criterio
-        // de username y password enviado.
+        //si se ingresaron datos al realizar el registro...
         if (user != undefined || user != '' && password != '' || password != undefined) {
+            //se buscan coincidencias en username y password con los datos ingresados por el usuario
             collUser.find({ username: user, password: password }).toArray((err, data) => {
                 if (data.length == 0) {
-                    // Si no encontró un registro con ese usuario y clave, invoco al callback de exito
+                    //si no hay datos iguales existentes, se insertan dichos datos a la colección
                     collUser.insert({
-                        username: user,
-                        password: password
-                    })
+                            username: user,
+                            password: password
+                        })
+                        //Llamo a la funcion cbOK, en respuesta de un registro exitoso
                     cbOK();
-
+                    //cierro la base de datos
                     client.close()
                 } else {
-                    // Si encontró uno o más de uno (que solo sería posible si tengo algún
-                    // usuario duplicado por error), llamo al callback de error
+                    //Llamo a la callback de error, en respuesta de un registro fallido
                     cbErr();
+                    //cierro la base de datos
                     client.close()
                 }
             })
         } else {
+            /*si no existen datos ingresados por el usuario, se llama al callback "vacio". en respuesta a un formulario de registro
+            sin datos*/
             cbVacio();
+            //cierro la base de datos
             client.close()
         }
     })
 }
 
-function currentTimeAudioStore(sessionID, currentTimeAudio, cbOK, cbErr) {
-    MongoClient.connect(dbURL, (err, client) => {
-        const db = client.db("testdb");
 
-        const collUser = db.collection("users");
-
-        if (sessionID != undefined || sessionID != '') {
-            collUser.find({ username: sessionID }).toArray((err, data) => {
-                if (data.length == 1) {
-
-                    collUser.insert({
-                        currentTimeAudio: currentTimeAudio
-                    })
-                    cbOK();
-
-                    client.close()
-                } else {
-
-
-                    cbErr();
-                    client.close()
-                }
-            })
-        }
-    })
-}
-
+//exportación de las funciones necesarias para server.js
 module.exports.validarUsuario = validarUsuario;
 module.exports.registrarUsuario = registrarUsuario;
-module.exports.currentTimeAudioStore = currentTimeAudioStore;
