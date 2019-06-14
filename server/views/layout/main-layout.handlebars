@@ -44,7 +44,7 @@
     <!-- Creo un DIV para guardar el length del playlist que le paso por el metodo GET de / -->
     <div id="playlist-length" style="display:none">{{playlist.length}}</div>
     {{#each playlist}}
-        <!-- por cada elemento de playlist Creo un DIV oculto para guardar la url del mismo que tambien paso por el metodo GET de /-->
+        <!-- por cada elemento de playlist Creo un DIV oculto para guardar la url del mismo que tambien paso por el metodo GET de "/" -->
         <div id="url-audio-{{@index}}" style="display:none">{{this.url}}</div>
         <div id="usuario-audio-{{@index}}" style="display:none">{{this.usuario}}</div>
         <div id="disco-audio-{{@index}}" style="display:none">{{this.disco}}</div>
@@ -81,158 +81,212 @@
     var divLength = document.getElementById("playlist-length")
     //lo parseo a INT para poder usarlo
     var lengthPlaylist = parseInt(divLength.innerHTML);
-    //Tomo el elemento que tenga el id "url-audio-*numero random que vaya del 0 al ultimo,
-    //gracias al length de playlist que guardé antes*" y tomo el url que tiene en su innerHTML
+    //declaro la variable "numPlay" igualada a 0, que determina qué archivo de audio reproduce el reproductor
     var numPlay = 0;
-    var url = document.getElementById(`url-audio-${numPlay}`).innerHTML;
-    var usuario = document.getElementById(`usuario-audio-${numPlay}`).innerHTML;
-    var disco = document.getElementById(`disco-audio-${numPlay}`).innerHTML;
-    var nombre = document.getElementById(`nombre-audio-${numPlay}`).innerHTML;
+    //Declaro la variable "reproductor" que toma como valor el elemento con ID "reproductor-pers" 
+    var reproductor= document.getElementById("reproductor-pers");
+    //declaro la variable "rangoVolume" que toma como valor el elemento con ID "volume" (control de volumen)
     var rangoVolume = document.getElementById("volume");
-    //tomo el reproductor por su id
-    var reproductor = document.getElementById("reproductor-pers");
-    var identificador = document.getElementById("identificador");
+    //Declaro la variable "barraDespla" que toma como valor el elemento con ID "seek" 
+    //(Barra de desplazamiento del tiempo del archivo de audio)
     var barraDespla = document.getElementById("seek");
-    var textoID = document.createElement("h5");
-    textoID.setAttribute("class","identificador-texto");
-    textoID.innerHTML = `${usuario} - ${disco} - ${nombre}`;
-    identificador.appendChild(textoID);
-    //cambio el source del reproductor por el url que tome dos pasos antes
-    reproductor.src = url;
-    setTimeout(function(){
-        barraDespla.max = reproductor.duration;
-    },500)
+    //ejecuto la función "cambiarDisplayNombrePista", para insertar el nombre de la pista actual en el reproductor
+    cambiarDisplayNombrePista("main");
+    //agrego un listener al elemento "rangoVolume", de tipo "input", 
+    //ejecutandose cada vez que el usuario haga una desplazamiento en la barra
     rangoVolume.addEventListener("input", function(){
+        //declaro la variable "valor" y la igualo al valor que toma el elemento "rangoVolume" (que el usuario establece al moverlo)
+        //y lo divido en 100 para que el elemento "rangoVolume" pueda procesarlo
         let valor = (this.value)/100;
+        //establezo el volumen del reproductor, igualandolo al valor que impuso el usuario
         reproductor.volume = valor;
     })
+    //agrego un listener al elemento "barraDespla", de tipo "input", ejecutandose cada vez que el usuario haga una desplazamiento en la barra
     barraDespla.addEventListener("input", function() {
+        //establezo el tiempo actual del reproductor, igualandolo al valor que impuso el usuario
 		reproductor.currentTime = this.value;
 	});
+    //agrego un listener al elemento "reproductor", de tipo "timeupdate", 
+    //ejecutandose cada vez que la reproduccion de un archivo avance en tiempo
     reproductor.addEventListener("timeupdate",function(){	  
+        //tomo el elemento con ID "currentTime", y a su innerHTML lo igualo al retorno que brinda la funcion "hora"
         document.getElementById("currentTime").innerHTML = hora(reproductor.currentTime); 
+        //declaro la variable "curtime", y la igualo al resultado de parsear a INT el tiempo actual del reproductor
         let curtime = parseInt(reproductor.currentTime, 10);
+        //igualo el valor del elemento "barraDespla" al valor de la variable "curtime" obtenido anteriormente
 		barraDespla.value = curtime; 
     },true);
 
+    //devuelve el tiempo del reproductor en un formato legible
     function hora(segundos){
+        //declaro la variable "d", que creará una instancia Date, 
+        //que tiene como parametros el tiempo del reproductor que recibió la funcion, multiplicado por 1000
         var d=new Date(segundos*1000);
+        //declaro la variable "minuto" que transforma el tiempo recibido en minutos de una forma legible
         var minuto = (d.getMinutes()<10)?"0"+d.getMinutes():d.getMinutes();
+        //declaro la variable "segundo" que transforma el tiempo recibido en segundos de una forma legible
         var segundo = (d.getSeconds()<10)?"0"+d.getSeconds():d.getSeconds();
+        //retorno tanto los minutos como los segundos de una forma legible
         return minuto+":"+segundo;
     }
 
-    function playPause(btn,aud){
-        var audio= document.getElementById(aud);
+    //funcion que ejecuta la orden de reproducir o pausar el archivo de audio
+    function playPause(btn){
+        //Declaro la variable "logo" que toma como valor el elemento con ID "imgLogo" 
         var logo = document.getElementById("imgLogo");
-        if(audio.paused){
-            audio.play();
+        //si el audio esta pausado
+        if(reproductor.paused){
+            //ejecuto la funcion "play" del archivo de audio
+            reproductor.play();
+            //cambio el estado de reproduccion de la animacion asignada al elemento "logo" a "running" (ejecutandose)
             logo.style.animationPlayState = "running";
+            //cambio la ruta de la imagen que representa el boton de reproducir, y establezco la imagen de "pause" en vez de la imagen de "play"
             btn.src ="../img/pause.png";
-            if (audio.loop == false){
-                audio.addEventListener("ended",()=>{
-                    next(aud);
+            //si no está definido que se reproduzca siempre el mismo archivo de audio
+            if (reproductor.loop == false){
+                //agrego un listener al elemento "audio", de tipo "ended", que se ejecutará cuando la reproduccion 
+                //del archivo de audio haya finalizado
+                reproductor.addEventListener("ended",()=>{
+                    //ejecuto la función "next" con el parametro "aud", recibido por la función "playPause"
+                    next();
                 })
             }
             
-
+        //si el audio esta corriendo, es decir, no está pausado
         }else{
-            audio.pause();
+            //pauso la reproduccion del audio
+            reproductor.pause();
+            //pauso la ejecucion de la animacion del elemento "logo"
             logo.style.animationPlayState = "paused";
+            //cambio la ruta de la imagen que representa el boton de reproducir, y establezco la imagen de "play" en vez de la imagen de "pause"
             btn.src ="../img/play.png";
         }
     }
-
+    //funcion que establece el volumen de la reproducción a 0
     function mute(btn,aud){
+        //Declaro la variable "aud" que toma como valor el elemento con ID que obtiene la funcion desde el parametro "aud" 
         var aud= document.getElementById(aud);
+        //Declaro la variable "vol" que toma como valor el elemento con ID "volume" (barra de volumen)
         var vol = document.getElementById("volume");
+        //si el volumen del audio tiene un valor de 0
         if(aud.volume == 0){
+            //le asigno un valor de volumen de 1 (maximo)
             aud.volume = 1;
+            //le asigno el valor del elemento "vol" a 100 (maximo)
             vol.value = 100;
+            //cambio la ruta de la imagen que representa el boton de enmudecer, y establezco la imagen de "speaker" en vez de la imagen de "mute"
             btn.src ="../img/speaker.png";
+        //si el volumen del audio tiene cualquier otro valor
         }else{
+            //le asigno un valor de volumen de 0 (minimo)
             aud.volume = 0;
+            //le asigno el valor del elemento "vol" a 0 (minimo)
             vol.value = 0;
+            //cambio la ruta de la imagen que representa el boton de enmudecer, y establezco la imagen de "mute" en vez de la imagen de "speaker"
             btn.src ="../img/mute.png";
         }
     }
-
+    //funcion que pausa la reproduccion y reestablece el tiempo de reproduccion al inicio
     function stop(btn, aud){
+        //Declaro la variable "aud" que toma como valor el elemento con ID que obtiene la funcion desde el parametro "aud" 
         var aud= document.getElementById(aud);
+        //Declaro la variable "play" que toma como valor el elemento con ID "playbutton" (boton de Play)
         var play = document.getElementById('playbutton');
+        //si el tiempo de reproducción actual es mayor a 0
         if(aud.currentTime > 0){
+            //establezco el tiempo de reproduccion actual a 0
             aud.currentTime = 0;
+            //pauso la reproduccion
             aud.pause();
+            //cambio la ruta de la imagen que representa el boton de reproducir, y establezco la imagen de "play" en vez de la imagen de "pause"
             play.src = "../img/play.png"
         }
     }
-
+    //funcion que establece un loop, donde se reproducirá siempre el mismo archivo de audio
     function replay(btn, aud){
+        //Declaro la variable "aud" que toma como valor el elemento con ID que obtiene la funcion desde el parametro "aud" 
         var aud= document.getElementById(aud);
+        //si la propiedad "loop" del elemento "aud" está activada
         if(aud.loop == true){
+            //desactivo la propiedad "loop" del elemento "aud"
             aud.loop = false;
+            //cambio la ruta de la imagen que representa el boton de replay, y establezco la imagen de "replay" en vez de la imagen de "shuffle"
             btn.src = "../img/replay.png"
+        //si la propiedad "loop" está desactivada
         }else{
+            //activo la propiedad "loop"
             aud.loop = true;
+            //cambio la ruta de la imagen que representa el boton de replay, y establezco la imagen de "shuffle" en vez de la imagen de "replay"
             btn.src = "../img/shuffle.png"
         }
     }
-
+    //funcion que reproduce el siguiente archivo de audio de la lista de reproducción
     function next(aud){
-        //vuelvo a tomar todo (sino no funciona, no se por qué)
-        var btn = document.getElementById("playbutton")
-        var repro= document.getElementById(aud);
+        //Declaro la variable "divLength" que toma como valor el elemento con ID "playlist-length" 
         var divLength = document.getElementById("playlist-length")
+        //Declaro la variable "lengthPlaylist" y la igualo al resultado de parsear a INT el innerHTML del elemento "divLength"
         var lengthPlaylist = parseInt(divLength.innerHTML);
-        //creo un url nuevo con otro div oculto que tomo (no logre evitar que tome el mismo de vez en cuando)
+        //si la variable "numPlay" es igual al largo de la lista de reproducción, menos una unidad
         if(numPlay == (lengthPlaylist-1)){
+            //establezo la variable "numPlay" a 0, para volver al principio de la lista de reproduccion
             numPlay = 0;
+        //si la variable "numPlay" es igual a cualquier otro valor
         }else{
+            //sumo una unidad a la variable "numPlay"
             numPlay++;
         }
-        var usuario = document.getElementById(`usuario-audio-${numPlay}`).innerHTML;
-        var disco = document.getElementById(`disco-audio-${numPlay}`).innerHTML;
-        var nombre = document.getElementById(`nombre-audio-${numPlay}`).innerHTML;
-        var identificador = document.getElementById("identificador");
-        identificador.innerHTML = '';
+        //ejecuto la función "cambiarDisplayNombrePista", para insertar el nombre de la pista actual en el reproductor
+        cambiarDisplayNombrePista(aud);
         
-        var textoID = document.createElement("h5");
-        
-        textoID.setAttribute("class","identificador-texto");
-        textoID.innerHTML = `${usuario} - ${disco} - ${nombre}`;
-        identificador.appendChild(textoID);
-
-        repro.src = document.getElementById(`url-audio-${numPlay}`).innerHTML;
-        setTimeout(function(){
-            barraDespla.max = repro.duration;
-        },500)
-        playPause(btn,aud)
 
     }
-
+    //función que ejecuta la reproduccion de un archivo de audio cuando el usuario clickea el mismo en la lista de reproducción
     function jump(aud,index){
+        //igualo la variable "numPlay" al valor que recibe la función por el parametro "index" (numero de pista a reproducir)
         numPlay = index;
+        //ejecuto la función "cambiarDisplayNombrePista", para insertar el nombre de la pista actual en el reproductor
+        cambiarDisplayNombrePista();     
+    }
+    //función que inserta el nombre de la pista actual en el reproductor
+    function cambiarDisplayNombrePista(origen){
+        //Declaro la variable "btn" que toma como valor el elemento con ID "playbutton" 
         var btn = document.getElementById("playbutton")
-        var repro= document.getElementById(aud);
+        //declaro la variable "usuario" que toma como valor el innerHTML que 
+        //posee el elemento con ID "usuario-audio-" + lo que tenga asignado "numPlay" (Nombre del usuario dueño del archivo de audio)
         var usuario = document.getElementById(`usuario-audio-${numPlay}`).innerHTML;
+        //declaro la variable "disco" que toma como valor el innerHTML 
+        //que posee el elemento con ID "disco-audio-" + lo que tenga asignado "numPlay" (Nombre del disco que contiene el archivo de audio)
         var disco = document.getElementById(`disco-audio-${numPlay}`).innerHTML;
+        //declaro la variable "nombre" que toma como valor el innerHTML 
+        //que posee el elemento con ID "nombre-audio-" + lo que tenga asignado "numPlay" (Nombre del archivo de audio)
         var nombre = document.getElementById(`nombre-audio-${numPlay}`).innerHTML;
+        //Declaro la variable "identificador" que toma como valor el elemento con ID "identificador" 
+        //(div que contendrá del nombre completo del archivo de audio)
         var identificador = document.getElementById("identificador");
+        //vacio el innerHTML del elemento "identificador" para cargarlo nuevamente sin repetir información
         identificador.innerHTML = '';
-        
+        //Declaro la variable "textoID" que creará un elemento "h5" (para insertar el nombre completo del archivo de audio)
         var textoID = document.createElement("h5");
-        
+        //le seteo el atributo "class", con valor "identificador-texto", al elemento "h5" creado anteriormente (textoID)
         textoID.setAttribute("class","identificador-texto");
+        //modifico el innerHTML del elemento "h5" creado anteriormente, 
+        //insertandole el nombre del usuario, el disco y el nombre del archivo correspondientes
         textoID.innerHTML = `${usuario} - ${disco} - ${nombre}`;
+        //inserto el elemento "h5" (textoID) dentro de "identificador" (div creado para contener dicho elemento "h5")
         identificador.appendChild(textoID);
-
-        repro.src = document.getElementById(`url-audio-${numPlay}`).innerHTML;
+        //cambio el source del reproductor por el url del archivo ya definido
+        reproductor.src = document.getElementById(`url-audio-${numPlay}`).innerHTML;
+        //seteo un TimeOut de medio segundo para darle tiempo al script de registrar el archivo de audio que debe reproducir
         setTimeout(function(){
-            barraDespla.max = repro.duration;
-            playPause(btn,aud)
-        },500)
-        
-
+            //establezco el limite de la barra de desplazamiento que controla el tiempo del archivo de audio, 
+            //igualandolo a la duración del mismo
+            barraDespla.max = reproductor.duration;
+            //si el origen de la llamada no es desde el principio del script
+            if(origen != "main"){
+                //ejecuto la funcion "playPause", para ejecutar la reproduccion del archivo de audio definido, y las animaciones correspondientes
+                playPause(btn)
+            }
+        },1000)
     }
 
 </script>

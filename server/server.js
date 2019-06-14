@@ -553,7 +553,7 @@ app.get('/notices', (req, res) => {
                     //le asigno la palabra "full" a la variable "carpeta", cambiando de caso en el switch
                 carpeta = 'full';
                 break;
-                //en caso de buscar audios
+                //en caso de haber concluido con la recolección de datos
             case 'full':
                 //luego de 2 segundos, dandole tiempo al script a rellenar cada array...
                 setTimeout(() => {
@@ -577,69 +577,127 @@ app.get('/notices', (req, res) => {
 
 //GET /gallery (para mostrar todos los discos subidos al servidor)
 app.get('/gallery', (req, res) => {
-
+    //defino lo que voy a mostrar primero, que siempre va a ser la portada del disco
     var carpeta = 'port';
+    //defino un array vacio donde guardaré cada portada encontrada (por el momento siempre será una sola portada)
     var fotosPortada = '';
+    //defino un array vacio donde guardaré cada contraportada encontrada (por el momento siempre será una sola contraportada)
     var fotosContraportada = '';
+    //defino un array vacio donde guardaré cada archivo de audio encontrado
     var audio = '';
+    //mientras "carpeta" sea igual a cualquiera de las opciones a mostrar (portada, contraportada, audio) o a "full", que quiere decir
+    //que terminé de recolectar información
     while (carpeta == 'port' || carpeta == 'contP' || carpeta == 'audio' || carpeta == 'full') {
-
+        //realizo un switch por cada opcion posible
         switch (carpeta) {
-            case 'port':
+            //en caso de buscar la portada
 
+
+
+
+
+
+
+
+            case 'port':
+                //realizo una lectura de la carpeta "portada" del disco (req.query.id) perteneciente al usuario definido (req.session.userId)
                 fs.readdir(`./client/files/${req.session.userId}/${req.query.id}/portada`, (err, archivos) => {
-                    if (archivos.length > 0) {
-                        for (let x = 0; x < archivos.length; x++) {
-                            fotosPortada += `<img src="../files/${req.session.userId}/${req.query.id}/portada/${archivos[x]}"></img><br>
+                        //si existen archivos dentro de dicha carpeta...
+                        if (archivos.length > 0) {
+                            //por cada archivo encontrado (en este caso siempre será uno)...
+                            for (let x = 0; x < archivos.length; x++) {
+                                //se sumariza el codigo HTML que representa la imagen a mostrar en el HTML final al array vacio "fotosPortada"
+                                fotosPortada += `<img src="../files/${req.session.userId}/${req.query.id}/portada/${archivos[x]}"></img><br>
                                 <button onclick="window.location.href = '/remove?id=${req.query.id}|portada|${x}'">Borrar archivo</button>
                                 <br>
                                    <br>
                                 `;
+                            }
+                        } else {
+                            //si no existen archivos, se le asigna una notificacion de error al array vacío "fotosPortada" para mostrar 
+                            //luego en el HTML final
+                            fotosPortada = "El disco no posee portada aún";
                         }
-                    } else {
-                        fotosPortada = "El disco no posee portada aún";
-                    }
-                })
+                    })
+                    //le asigno lo siguiente que quiero mostrar a la variable "carpeta", cambiando de caso en el switch
                 carpeta = 'contP';
                 break;
-            case 'contP':
+                //en caso de buscar la contraportada
 
+
+
+
+
+
+
+            case 'contP':
+                //realizo una lectura de la carpeta "contraportada" del disco (req.query.id) 
+                //perteneciente al usuario definido (req.session.userId)
                 fs.readdir(`./client/files/${req.session.userId}/${req.query.id}/contraportada`, (err, archivos) => {
-                    if (archivos.length > 0) {
-                        for (let x = 0; x < archivos.length; x++) {
-                            fotosContraportada += `<img src="../files/${req.session.userId}/${req.query.id}/contraportada/${archivos[x]}"></img>
+                        //si existen archivos dentro de dicha carpeta...
+                        if (archivos.length > 0) {
+                            //por cada archivo encontrado (en este caso siempre será uno)...
+                            for (let x = 0; x < archivos.length; x++) {
+                                //se sumariza el codigo HTML que representa la imagen 
+                                //a mostrar en el HTML final al array vacio "fotosContraportada"
+                                fotosContraportada += `<img src="../files/${req.session.userId}/${req.query.id}/contraportada/${archivos[x]}"></img>
                             <br><button onclick="window.location.href = '/remove?id=${req.query.id}|contraportada|${x}'">Borrar archivo</button>
                                 <br>
                                    <br>
                                 `;
+                            }
+                        } else {
+                            //si no existen archivos, se le asigna una notificacion de error al array vacío "fotosContraportada" para mostrar 
+                            //luego en el HTML final
+                            fotosContraportada = "El disco no posee contraportada aún";
                         }
-                    } else {
-                        fotosContraportada = "El disco no posee contraportada aún";
-                    }
-                })
+                    })
+                    //le asigno lo siguiente que quiero mostrar a la variable "carpeta", cambiando de caso en el switch
                 carpeta = 'audio';
                 break;
-            case 'audio':
+                //en caso de buscar audios
 
+
+
+
+
+
+
+            case 'audio':
+                //realizo una lectura de la carpeta "audio" del disco (req.query.id) perteneciente al usuario definido (req.session.userId)
                 fs.readdir(`./client/files/${req.session.userId}/${req.query.id}/audio`, (err, archivos) => {
-                    if (archivos.length > 0) {
-                        for (let x = 0; x < archivos.length; x++) {
-                            audio += `<audio controls src="../files/${req.session.userId}/${req.query.id}/audio/${archivos[x]}"></audio><br><br>${archivos[x]}
+                        //si existen archivos dentro de dicha carpeta...
+                        if (archivos.length > 0) {
+                            //por cada archivo encontrado...
+                            for (let x = 0; x < archivos.length; x++) {
+                                //se sumariza el codigo HTML que representa el archivo de audio
+                                //a mostrar en el HTML final al array vacio "audio"
+                                audio += `<audio controls src="../files/${req.session.userId}/${req.query.id}/audio/${archivos[x]}"></audio><br><br>${archivos[x]}
                             <br><button onclick="window.location.href = '/remove?id=${req.query.id}|audio|${x}'">Borrar archivo</button>
                                 <br>
                                    <br>
                                 `;
+                            }
+                            //creo un boton que redirecciona al GET de /remove con los datos 
+                            //de cada archivo de audio en concreto, para ser eliminado
+                            audio += `<br><button onclick="window.location.href = '/remove?id=${req.query.id}|audio|all'">Borrar tracklist</button>`
+                        } else {
+                            //si no existen archivos, se le asigna una notificacion de error al array vacío "audio" para mostrar 
+                            //luego en el HTML final
+                            audio = "El disco no posee Tracklist aún";
                         }
-                        audio += `<br><button onclick="window.location.href = '/remove?id=${req.query.id}|audio|all'">Borrar tracklist</button>`
-                    } else {
-                        audio = "El disco no posee Tracklist aún";
-                    }
-                })
+                    })
+                    //le asigno la palabra "full" a la variable "carpeta", cambiando de caso en el switch
                 carpeta = 'full';
                 break;
-            case 'full':
+                //en caso de haber concluido con la recolección de datos
 
+
+
+            case 'full':
+                //luego de 2 segundos, dandole tiempo al script a rellenar cada array...
                 setTimeout(() => {
+                    //renderizo el handlebars "home-General" con cada array ya completo, el nombre del usuario y el array global "playlist"
                     res.render('gallery-General', {
                         title: `Groove And Play - ${req.query.id}`,
                         fotosPortada: fotosPortada,
@@ -651,6 +709,7 @@ app.get('/gallery', (req, res) => {
                     })
 
                 }, 2000);
+                //vacío la variable "carpeta" para cortar con el loop generado en el while        
                 carpeta = '';
         }
     }
@@ -658,54 +717,141 @@ app.get('/gallery', (req, res) => {
 });
 
 
-// GET /remove
+// GET /remove (otorga la posibilidad de eliminar tanto un disco completo, como cada una de sus partes)
 app.get('/remove', (req, res) => {
+    //vacío el array de resultados para no repetir datos que ya haya obtenido en ejecuciones anteriores
     resultados = '';
+    //Tomo el query de la llamada realizada por el usuario y la divido con la funcion "split" para definir:
+    //-Qué item especifico voy a borrar (queBorrar[2]), el cual puede ser todos o uno en especifico (éste último se utiliza para borrar audios)
+    //-Qué items voy a borrar (QueBorrar[1]), el cual puede ser todos o uno('all', o el nombre de la categoría),
+    //-Qué disco voy a borrar (QueBorrar[0]) 
     let queBorrar = req.query.id.split('|');
-
+    //realizo un switch por cada opcion posible refiriendome a queBorrar[1]
     switch (queBorrar[1]) {
+        //en caso de que el usuario elija borrar el disco completo
         case 'all':
+            //realizo una lectura de la carpeta "audio", dentro de la carpeta del disco correspondiente, 
+            //el cual se ubica dentro de la carpeta propia del usuario
             fs.readdir(`./client/files/${req.session.userId}/${queBorrar[0]}/audio`, (err, archivos) => {
-                for (let x = 0; archivos.length > x; x++) {
-                    fs.unlink(`./client/files/${req.session.userId}/${queBorrar[0]}/audio/${archivos[x]}`, (err) => {
-
-                    })
-                }
-            })
+                    //por cada elemento obtenido...
+                    for (let x = 0; archivos.length > x; x++) {
+                        //realizo la funcion "unlink" (eliminar archivo) pasando como parametro los datos necesarios para crear la ruta del archivo correspondiente
+                        fs.unlink(`./client/files/${req.session.userId}/${queBorrar[0]}/audio/${archivos[x]}`, (err) => {
+                            //si hay error al eliminar el archivo
+                            if (err) {
+                                console.log(`error al borrar ${archivos[x]}`);
+                                //si no hay ningun tipo de error
+                            } else {
+                                console.log(`${archivos[x]} borrado con éxito`);
+                            }
+                        })
+                    }
+                })
+                //realizo una lectura de la carpeta "portada", dentro de la carpeta del disco correspondiente, 
+                //el cual se ubica dentro de la carpeta propia del usuario
             fs.readdir(`./client/files/${req.session.userId}/${queBorrar[0]}/portada`, (err, archivos) => {
-                fs.unlink(`./client/files/${req.session.userId}/${queBorrar[0]}/portada/${archivos}`, (err) => {
-
+                    //realizo la funcion "unlink" (eliminar archivo) pasando como parametro los datos 
+                    //necesarios para crear la ruta del archivo correspondiente
+                    fs.unlink(`./client/files/${req.session.userId}/${queBorrar[0]}/portada/${archivos}`, (err) => {
+                        //si hay error al eliminar el archivo
+                        if (err) {
+                            console.log(`error al borrar ${archivos}`);
+                            //si no hay ningun tipo de error
+                        } else {
+                            console.log(`${archivos} borrado con éxito`);
+                        }
+                    })
                 })
-            })
+                //realizo una lectura de la carpeta "contraportada", dentro de la carpeta del disco correspondiente, 
+                //el cual se ubica dentro de la carpeta propia del usuario
             fs.readdir(`./client/files/${req.session.userId}/${queBorrar[0]}/contraportada`, (err, archivos) => {
-                fs.unlink(`./client/files/${req.session.userId}/${queBorrar[0]}/contraportada/${archivos}`, (err) => {
-
+                    //realizo la funcion "unlink" (eliminar archivo) pasando como parametro los datos 
+                    //necesarios para crear la ruta del archivo correspondiente
+                    fs.unlink(`./client/files/${req.session.userId}/${queBorrar[0]}/contraportada/${archivos}`, (err) => {
+                        //si hay error al eliminar el archivo
+                        if (err) {
+                            console.log(`error al borrar ${archivos}`);
+                            //si hay error al eliminar el archivo
+                        } else {
+                            console.log(`${archivos} borrado con éxito`);
+                        }
+                    })
                 })
-            })
+                //seteo un TimeOut de 1 segundo para darle tiempo al script a que elimine los archivos dentro de las carpetas
+                //para poder eliminar dichas carpetas
             setTimeout(() => {
+                //Lanzo la funcion "rmdir" (eliminar carpeta) pasando como parametro los datos 
+                //necesarios para crear la ruta de la carpeta correspondiente
                 fs.rmdir(`./client/files/${req.session.userId}/${queBorrar[0]}/portada`, (err) => {
-
-                })
+                        //si hay error al eliminar la carpeta
+                        if (err) {
+                            console.log(`error al borrar la carpeta "portada"`);
+                            //si no hay ningun tipo de error
+                        } else {
+                            console.log(`carpeta "portada" borrado con éxito`);
+                        }
+                    })
+                    //Lanzo la funcion "rmdir" (eliminar carpeta) pasando como parametro los datos 
+                    //necesarios para crear la ruta de la carpeta correspondiente
                 fs.rmdir(`./client/files/${req.session.userId}/${queBorrar[0]}/contraportada`, (err) => {
-
-                })
+                        //si hay error al eliminar la carpeta
+                        if (err) {
+                            console.log(`error al borrar la carpeta "contraportada"`);
+                            //si no hay ningun tipo de error
+                        } else {
+                            console.log(`carpeta "contraportada" borrado con éxito`);
+                        }
+                    })
+                    //Lanzo la funcion "rmdir" (eliminar carpeta) pasando como parametro los datos 
+                    //necesarios para crear la ruta de la carpeta correspondiente
                 fs.rmdir(`./client/files/${req.session.userId}/${queBorrar[0]}/audio`, (err) => {
-
+                    //si hay error al eliminar la carpeta
+                    if (err) {
+                        console.log(`error al borrar la carpeta "audio"`);
+                        //si no hay ningun tipo de error
+                    } else {
+                        console.log(`carpeta "audio" borrado con éxito`);
+                    }
                 })
             }, 1000);
+            //seteo un TimeOut de 2 segundos para darle tiempo al script a eliminar las anteriores carpetas
+            //para poder eliminar la carpeta raiz del disco
             setTimeout(() => {
+                //Lanzo la funcion "rmdir" (eliminar carpeta) pasando como parametro los datos 
+                //necesarios para crear la ruta de la carpeta correspondiente
                 fs.rmdir(`./client/files/${req.session.userId}/${queBorrar[0]}`, (err) => {
-
+                    //si hay error al eliminar la carpeta
+                    if (err) {
+                        console.log(`error al borrar la carpeta "${queBorrar[0]}"`);
+                        //si no hay ningun tipo de error
+                    } else {
+                        console.log(`carpeta "${queBorrar[0]}" borrado con éxito`);
+                    }
                 })
             }, 2000);
+            //seteo un TimeOut de 3 segundos para darle tiempo al script a eliminar las anteriores carpetas
+            //para poder eliminar la carpeta raiz del usuario
             setTimeout(() => {
+                //Lanzo la funcion "rmdir" (eliminar carpeta) pasando como parametro los datos 
+                //necesarios para crear la ruta de la carpeta correspondiente
                 fs.rmdir(`./client/files/${req.session.userId}`, (err) => {
-
+                    //si hay error al eliminar la carpeta
+                    if (err) {
+                        console.log(`error al borrar la carpeta "${req.session.userId}"`);
+                        //si no hay ningun tipo de error
+                    } else {
+                        console.log(`carpeta "${req.session.userId}" borrado con éxito`);
+                    }
                 })
             }, 3000);
+            //seteo un TimeOut de 4 segundos para darle tiempo al script a eliminar las anteriores carpetas
+            //para poder renderizar el handlebars "removeAll" con el mensaje de exito
             setTimeout(() => {
+                //vacio el array "playlist" para evitar datos repetidos
                 playlist = [];
+                //cargo el array "playlist" con los archivos que quedaron dentro del servidor
                 cargarMusicaSubida(playlist);
+                //renderizo el handlebars "removeAll" con el mensaje de exito
                 res.render('removeAll', {
                     title: "Groove And Play - Borrado de archivos",
                     usuario: req.session.userId,
@@ -713,18 +859,38 @@ app.get('/remove', (req, res) => {
                 })
             }, 4000);
             break;
-
+            //en caso de que la variable queBorrar[1] sea distinta de "all"
         default:
+            //realizo un switch por cada opcion posible refiriendome a queBorrar[2]
             switch (queBorrar[2]) {
+                //en caso de que la variable queBorrar[2] sea "all"
                 case 'all':
+                    //realizo una lectura de la carpeta establecida por queBorrar[1], dentro de la carpeta del disco correspondiente, 
+                    //el cual se ubica dentro de la carpeta propia del usuario
                     fs.readdir(`./client/files/${req.session.userId}/${queBorrar[0]}/${queBorrar[1]}`, (error, archivos) => {
+                        //por cada elemento encontrado en la carpeta establecida por queBorrar[1]...
                         for (let x = 0; x < archivos.length; x++) {
-                            fs.unlink((`./client/files/${req.session.userId}/${queBorrar[0]}/${queBorrar[1]}/` + archivos[x]), function(err) {});
+                            //realizo la función  "unlink" (eliminar archivos) pasando como parametro los datos 
+                            //necesarios para crear la ruta de la carpeta correspondiente
+                            fs.unlink((`./client/files/${req.session.userId}/${queBorrar[0]}/${queBorrar[1]}/` + archivos[x]), function(err) {
+                                //si hay error al eliminar el archivo
+                                if (err) {
+                                    console.log(`error al borrar ${archivos[x]}`);
+                                    //si no hay ningun tipo de error
+                                } else {
+                                    console.log(`${archivos[x]} borrado con éxito`);
+                                }
+                            });
                         }
                     });
+                    //seteo un TimeOut de 2 segundos para darle tiempo al script a eliminar los archivos correspondientes
+                    //para poder renderizar el handlebars "removeAll" con el mensaje de exito
                     setTimeout(() => {
+                        //vacio el array "playlist" para evitar datos repetidos
                         playlist = [];
+                        //cargo el array "playlist" con los archivos que quedaron dentro del servidor
                         cargarMusicaSubida(playlist);
+                        //renderizo el handlebars "removeAll" con el mensaje de exito
                         res.render('removeAll', {
                             title: "Groove And Play - Borrado de archivos",
                             usuario: req.session.userId,
@@ -732,14 +898,31 @@ app.get('/remove', (req, res) => {
                         })
                     }, 2000);
                     break;
-
+                    //en caso de que la variable queBorrar[2] sea distinto de "all"
                 default:
+                    //realizo una lectura de la carpeta establecida por queBorrar[1], dentro de la carpeta del disco correspondiente, 
+                    //el cual se ubica dentro de la carpeta propia del usuario
                     fs.readdir(`./client/files/${req.session.userId}/${queBorrar[0]}/${queBorrar[1]}`, (error, archivos) => {
-                        fs.unlink((`./client/files/${req.session.userId}/${queBorrar[0]}/${queBorrar[1]}/` + archivos[queBorrar[2]]), function(err) {});
+                        //realizo la función  "unlink" (eliminar archivos) pasando como parametro los datos 
+                        //necesarios para crear la ruta de la carpeta correspondiente
+                        fs.unlink((`./client/files/${req.session.userId}/${queBorrar[0]}/${queBorrar[1]}/` + archivos[queBorrar[2]]), function(err) {
+                            //si hay error al borrar el archivo
+                            if (err) {
+                                console.log(`error al borrar ${archivos[queBorrar[2]]}`);
+                                //si no hay ningun tipo de error
+                            } else {
+                                console.log(`${archivos[queBorrar[2]]} borrado con éxito`);
+                            }
+                        });
                     });
+                    //seteo un TimeOut de 2 segundos para darle tiempo al script a eliminar los archivos correspondientes
+                    //para poder renderizar el handlebars "removeAll" con el mensaje de exito                   
                     setTimeout(() => {
+                        //vacio el array "playlist" para evitar datos repetidos
                         playlist = [];
+                        //cargo el array "playlist" con los archivos que quedaron dentro del servidor
                         cargarMusicaSubida(playlist);
+                        //renderizo el handlebars "removeAll" con el mensaje de exito
                         res.render('removeAll', {
                             title: "Groove And Play - Borrado de archivos",
                             usuario: req.session.userId,
@@ -757,45 +940,70 @@ app.listen(3000, function() {
     console.log("Escuchando puerto 3000")
 });
 
-// crear carpeta segun el nombre del Disco que pone el usuario
+// crear carpeta segun el nombre del Disco que pone el usuario 
+//y sube cada archivo al servidor ubicandolo dentro de su carpeta correspondiente
 function crearCarpeta(req, queCrear) {
+    //por cada elemento seleccionado por el usuario en el formulario de subida de archivos
     for (let x = 0; x <= req.files.length - 1; x++) {
+        //realizo un switch por cada opcion posible refiriendome a queCrear[0]
         switch (queCrear[0]) {
+            //en caso de que la variable queCrear[0] sea igual a "port"
             case "port":
+                //realizo la funcion "mkdir" (crear carpeta) para crear la carpeta con el nombre del usuario actual
                 fs.mkdir(`./client/files/${req.session.userId}`, () => {
-                    fs.mkdir(`./client/files/${req.session.userId}/${req.body.nombreDisco}`, () => {
+                        //realizo la funcion "mkdir" (crear carpeta) para crear la carpeta con el nombre del disco que el usuario especificó
+                        fs.mkdir(`./client/files/${req.session.userId}/${req.body.nombreDisco}`, () => {
+                            //realizo la funcion "mkdir" (crear carpeta) para crear la carpeta "portada" correspondiente al disco especificado
+                            fs.mkdir(`./client/files/${req.session.userId}/${req.body.nombreDisco}/portada`, () => {
 
-                        fs.mkdir(`./client/files/${req.session.userId}/${req.body.nombreDisco}/portada`, () => {
+                                })
+                                //realizo la funcion "mkdir" (crear carpeta) para crear la carpeta "contraportada" correspondiente al disco especificado
+                            fs.mkdir(`./client/files/${req.session.userId}/${req.body.nombreDisco}/contraportada`, () => {
 
-                        })
-                        fs.mkdir(`./client/files/${req.session.userId}/${req.body.nombreDisco}/contraportada`, () => {
+                                })
+                                //realizo la funcion "mkdir" (crear carpeta) para crear la carpeta "audio" correspondiente al disco especificado
+                            fs.mkdir(`./client/files/${req.session.userId}/${req.body.nombreDisco}/audio`, () => {
 
-                        })
-                        fs.mkdir(`./client/files/${req.session.userId}/${req.body.nombreDisco}/audio`, () => {
-
+                            })
                         })
                     })
-                })
+                    //seteo un TimeOut de 1 segundo para darle tiempo al script a crear las carpetas correspondientes
                 setTimeout(() => {
+                    //realizo la funcion "createReadStream" para leer el arhcivo de origen de la subida, luego utilizo la funcion "pipe" 
+                    //para unir a la primer funcion con la funcion "createWriteStream" para, desde el archivo de origen, crear otro archivo
+                    //igual dentro de la carpeta correspondiente y con su nombre final
                     fs.createReadStream('./client/files/' + req.files[x].filename).pipe(fs.createWriteStream('./client/files/' + req.session.userId + '/' + req.body.nombreDisco + '/portada/' + 'portada-' + req.body.nombreDisco + '.jpg'));
+                    //realizo la funcion "unlink" con la ruta del archivo original, para eliminarlo
                     fs.unlink(('./client/files/' + req.files[x].filename), () => {
 
                     });
                 }, 1000);
                 break;
+                //en caso de que la variable queCrear[0] sea igual a "contP"
             case "contP":
+                //realizo la funcion "createReadStream" para leer el arhcivo de origen de la subida, luego utilizo la funcion "pipe" 
+                //para unir a la primer funcion con la funcion "createWriteStream" para, desde el archivo de origen, crear otro archivo
+                //igual dentro de la carpeta correspondiente y con su nombre final
                 fs.createReadStream('./client/files/' + req.files[x].filename).pipe(fs.createWriteStream('./client/files/' + req.session.userId + '/' + queCrear[1] + '/contraportada/' + 'contraportada-' + queCrear[1] + '.jpg'));
+                //realizo la funcion "unlink" con la ruta del archivo original, para eliminarlo
                 fs.unlink(('./client/files/' + req.files[x].filename), () => {
 
                 });
                 break;
+                //en caso de que la variable queCrear[0] sea igual a "audio"
             case "audio":
+                //realizo la funcion "createReadStream" para leer el arhcivo de origen de la subida, luego utilizo la funcion "pipe" 
+                //para unir a la primer funcion con la funcion "createWriteStream" para, desde el archivo de origen, crear otro archivo
+                //igual dentro de la carpeta correspondiente y con su nombre final
                 fs.createReadStream('./client/files/' + req.files[x].filename).pipe(fs.createWriteStream(`./client/files/${req.session.userId}/${queCrear[1]}/audio/track${x}-${req.files[x].originalname}`));
+                //realizo la funcion "unlink" con la ruta del archivo original, para eliminarlo
                 fs.unlink(('./client/files/' + req.files[x].filename), () => {
 
                 });
                 break;
+                //en caso de que la variable queCrear[0] sea distinto a cualquier opcion anterior 
             default:
+                //vacio "req.files", que contiene los archivos seleccionados para subir
                 req.files = '';
                 break;
         }
@@ -803,10 +1011,23 @@ function crearCarpeta(req, queCrear) {
 }
 
 // verificar si hay errores, y si no los hay, redireccionar al siguiente paso de la subida del disco
+/**
+ * 
+ * @param {int} errors 
+ * @param {array} queCrear 
+ * @param {object} req 
+ * @param {object} res 
+ * @param {array} resultados 
+ */
 function verificarErroresAlSubirArchivo(errors, queCrear, req, res, resultados) {
+    //si no se ha conteado ningun error
     if (errors == 0) {
+        //realizo un switch por cada opcion posible refiriendome a queCrear[0]
         switch (queCrear[0]) {
+            //en caso de que la variable queCrear[0] sea igual a "port"
             case "port":
+                //renderizo el handlebars "upload-DiscoContraP" para continuar con la subida de los 
+                //archivos correspondientes a la contraportada
                 res.render('upload-DiscoContraP', {
                     title: 'Groove And Play - Contraportada del Disco',
                     disco: req.body.nombreDisco,
@@ -814,7 +1035,10 @@ function verificarErroresAlSubirArchivo(errors, queCrear, req, res, resultados) 
                     playlist: playlist
                 });
                 break;
+                //en caso de que la variable queCrear[0] sea igual a "contP"
             case "contP":
+                //renderizo el handlebars "upload-Discoaudio" para continuar con la subida de los 
+                //archivos de audio 
                 res.render('upload-DiscoAudio', {
                     title: 'Groove And Play - Archivos de audio',
                     disco: queCrear[1],
@@ -822,12 +1046,18 @@ function verificarErroresAlSubirArchivo(errors, queCrear, req, res, resultados) 
                     playlist: playlist
                 });
                 break;
+                //en caso de que la variable queCrear[0] sea distinta de las opciones anteriores
             default:
+                //vacio el array "playlist" para evitar datos repetidos
                 playlist = [];
+                ç
+                //seteo un TimeOut para darle tiempo al script a subir los archivos al servidor
+                //para luego cargar el array "playlist" incluyendo los nuevos archivos de audio
                 setTimeout(function() {
+                    //cargo el array "playlist" incluyendo los archivos nuevos
                     cargarMusicaSubida(playlist);
                 }, 2000);
-
+                //renderizo el handlebars "upload-Complete" mostrando el mensaje de exito en la subida
                 res.render('upload-Complete', {
                     title: 'Groove And Play - Finalizar',
                     usuario: req.session.userId,
@@ -835,21 +1065,29 @@ function verificarErroresAlSubirArchivo(errors, queCrear, req, res, resultados) 
                 });
                 break;
         }
+        //si el conteo de errores supera a 0
     } else {
+        //si queCrear[0] es igual a "port"
         if (queCrear[0] == 'port') {
+            //renderizo el handlebars "upload-General" mostrando que hubo errores de subida, y cuales fueron
             res.render('upload-General', {
-                title: 'Groove And Play - Errores de subida',
-                listaArchivos: resultados,
-                redireccion: queCrear[0],
-                disco: req.body.nombreDisco,
-                usuario: req.session.userId,
-                playlist: playlist
-            })
+                    title: 'Groove And Play - Errores de subida',
+                    listaArchivos: resultados,
+                    redireccion: queCrear[0],
+                    //al ser la subida principal, donde defino el nombre del disco, utilizo "req.body.nombreDisco"
+                    disco: req.body.nombreDisco,
+                    usuario: req.session.userId,
+                    playlist: playlist
+                })
+                //si queCrear[0] es igual a cualquier opcion restante
         } else {
+            //renderizo el handlebars "upload-General" mostrando que hubo errores de subida, y cuales fueron
             res.render('upload-General', {
                 title: 'Groove And Play - Errores de subida',
                 listaArchivos: resultados,
                 redireccion: queCrear[0],
+                //al no ser la subida principal, donde defino el nombre del disco, utilizo "queCrear[1]", 
+                //el cual contiene el nombre del disco
                 disco: queCrear[1],
                 usuario: req.session.userId,
                 playlist: playlist

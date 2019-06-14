@@ -5,6 +5,8 @@
 </style>
 Debe seleccionar un archivo
 <script>
+    //seteo un TimeOut de 2 segundos para que luego de visualizar los errores, 
+    //redireccione al usuario a la pantalla de subida de archivos, en la sección donde se encontraron los errores
     setTimeout(function(){
         console.log("esto: "+ `{{redireccion}}`);
         window.location.href = "/subirarchivos?id={{redireccion}}|{{disco}}"

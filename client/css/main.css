@@ -1,21 +1,79 @@
+/*CLASES*/
+
+
+/*Handlebars main-layout*/
+
 * {
     margin: 0;
     padding: 0;
 }
 
-#flechaDerecha {
-    display: flex;
-    margin-left: 81%;
-    height: 80px;
-    width: 80px;
+
+/*Barra de navegación + Tracklist*/
+
+.nav-derecha {
+    background-color: rgba(0, 0, 0, .6);
+    display: block;
+    height: 81.1%;
+    margin-left: 75%;
+    width: 25%;
+    position: fixed;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
-#flechaIzquierda {
-    display: none;
-    margin-left: 26%;
-    height: 80px;
-    width: 80px;
+.saludo {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 15px;
+    margin-bottom: 30px;
 }
+
+.button-nav {
+    background-color: rgba(0, 0, 0, 0.137);
+    display: block;
+    width: 100%;
+    height: 6%;
+    border: none;
+    border-radius: 4%;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: rgb(136, 129, 107);
+}
+
+.button-nav:hover {
+    width: 110%;
+    color: rgb(192, 171, 104);
+}
+
+.img-usuario {
+    margin: 20px 0;
+    width: 50%;
+    height: 16%;
+    border-radius: 50%;
+}
+
+.logo {
+    position: fixed;
+    bottom: 0px;
+    width: 200px;
+    height: 80px;
+    display: flex;
+    background: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.logo-img {
+    animation: 3s rotate linear infinite;
+    animation-play-state: paused;
+    transform-origin: 50% 50%;
+}
+
+
+/*Reproductor de Musica*/
 
 input[type="range"] {
     width: 300px;
@@ -52,21 +110,122 @@ input::-webkit-slider-thumb {
     /* W3C */
 }
 
-img {
-    width: 390px;
-    height: 390px;
-    display: inline-block;
-    transition: box-shadow 2s, transform 500ms, filter 500ms ease-in-out;
+.contenedor-reproductor {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    height: 84px;
+    padding: 17px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.473);
 }
 
-body {
-    background: url(../img/background.jpg) center center fixed no-repeat;
-    background-size: cover;
-    font-family: 'Noto Sans JP', sans-serif;
-    text-align: center;
+.boton-contenedor-secundario {
+    margin-bottom: 10px;
+}
+
+.boton-contenedor-tercero {
+    margin-bottom: 20px;
+}
+
+.boton-contenedor-mute {
+    position: absolute;
+    display: inline;
+    margin-top: -75px;
+    margin-left: 120px;
+}
+
+.boton-contenedor-mute:hover .mute-button {
+    margin-left: 0px
+}
+
+.mute-button {
+    margin-left: 39px;
+}
+
+.boton-contenedor-mute:hover .range-volume {
+    display: flex;
+    width: 50% !important;
+}
+
+.divId {
+    margin-left: -370px;
+    width: 290px;
+}
+
+.barraCurrent {
+    position: relative;
+    top: -19px;
+    display: flex;
+    width: 300%;
+    height: 15px;
+    margin-left: 100%;
+}
+
+.identificador-animado {
     overflow: hidden;
-    animation: slidein 1s;
-    margin-bottom: 150px;
+}
+
+.identificador-texto {
+    color: rgb(136, 129, 107);
+    animation-iteration-count: infinite;
+    animation-delay: initial;
+    animation-timing-function: linear;
+    animation-duration: 10s;
+    animation-name: slidein-nameAudio;
+}
+
+.range-volume {
+    position: relative;
+    display: none;
+    bottom: 43px;
+    width: 0% !important;
+    height: 5px !important;
+    margin-left: 3%;
+}
+
+.current-time {
+    position: relative;
+    color: rgb(136, 129, 107);
+    top: 2.3px;
+}
+
+
+/*FIN*/
+
+
+/*Handlebars gallery-General*/
+
+.slider {
+    width: 85%;
+    height: 506px;
+    margin-left: -10%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.slider ul {
+    padding: 0;
+    display: flex;
+    width: 400%;
+}
+
+.slider li {
+    width: 100%;
+    list-style: none;
+}
+
+.div-portada {
+    position: relative;
+    display: inline-table;
+    text-align: center;
+    transition: opacity 1s;
+    width: 40%;
+    border-radius: 6px;
+    background-color: rgb(206, 200, 181);
 }
 
 .boton-borrar-todo {
@@ -76,41 +235,106 @@ body {
     margin-left: 10%
 }
 
-h1 {
-    padding-top: 2%;
-    font-size: 30px;
-    color: rgb(192, 171, 104);
-}
-
-h3 {
-    padding-bottom: 10px;
-    font-size: 20px;
-    margin: 5px 5px 10px 5px;
-    color: rgb(112, 101, 66);
-}
-
-img:hover {
-    transform: scale(1.05);
-}
-
-nav {
-    background-color: rgba(0, 0, 0, .6);
-    display: block;
-    height: 100%;
-    width: 15%;
+.flecha {
     position: fixed;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: -22%;
+    margin-left: 40%
 }
 
-.nav-derecha {
-    background-color: rgba(0, 0, 0, .6);
-    display: block;
-    height: 81.1%;
-    margin-left: 75%;
-    width: 25%;
-    position: fixed;
+#flechaDerecha {
+    display: flex;
+    margin-left: 81%;
+    height: 80px;
+    width: 80px;
+}
+
+#flechaIzquierda {
+    display: none;
+    margin-left: 26%;
+    height: 80px;
+    width: 80px;
+}
+
+.div-noticia {
+    position: relative;
+    display: inline-table;
+    text-align: center;
+    transition: opacity 1s;
+    opacity: 0;
+    width: 40%;
+    border-radius: 6px;
+    background-color: rgb(206, 200, 181);
+}
+
+
+/*FIN*/
+
+
+/*Handlebars gallery*/
+
+.contenedor-noticias {
+    display: flex;
+    flex-flow: row wrap;
+    align-self: center;
+    width: 40%;
+    height: 380px;
+    position: relative;
+    left: 30%;
     overflow-y: scroll;
-    overflow-x: hidden;
 }
+
+.div-noticias {
+    flex: 1 1 1;
+    border-radius: 6px;
+    height: 350px;
+    border: 2px solid rgb(206, 200, 181);
+    background-color: rgb(206, 200, 181);
+    margin: 10px;
+    width: 50%;
+}
+
+.img-noticias {
+    width: 80% !important;
+    height: 45% !important;
+}
+
+
+/*FIN*/
+
+
+/*Handlebars home*/
+
+.titular {
+    text-transform: uppercase;
+    font-size: 40px;
+    text-align: center;
+}
+
+
+/*FIN*/
+
+
+/*Handlebars index*/
+
+.button {
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 500;
+    background-color: rgb(158, 140, 80);
+    color: rgb(51, 46, 29);
+}
+
+
+/*FIN*/
+
+
+/*Formularios*/
 
 form {
     display: flex;
@@ -149,6 +373,54 @@ form input[type="submit"]:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
+
+/*FIN*/
+
+
+/*Estilos para ELEMENTOS*/
+
+nav {
+    background-color: rgba(0, 0, 0, .6);
+    display: block;
+    height: 100%;
+    width: 15%;
+    position: fixed;
+}
+
+img {
+    width: 390px;
+    height: 390px;
+    display: inline-block;
+    transition: box-shadow 2s, transform 500ms, filter 500ms ease-in-out;
+}
+
+body {
+    background: url(../img/background.jpg) center center fixed no-repeat;
+    background-size: cover;
+    font-family: 'Noto Sans JP', sans-serif;
+    text-align: center;
+    overflow: hidden;
+    animation: slidein 1s;
+    margin-bottom: 150px;
+}
+
+h1 {
+    padding-top: 2%;
+    font-size: 30px;
+    color: rgb(192, 171, 104);
+}
+
+h3 {
+    padding-bottom: 10px;
+    font-size: 20px;
+    margin: 5px 5px 10px 5px;
+    color: rgb(112, 101, 66);
+}
+
+img:hover {
+    transform: scale(1.05);
+}
+
 h4 {
     margin: 30px 0 20px 0;
 }
@@ -160,243 +432,11 @@ h2 {
     font-size: 30px;
 }
 
-.logo {
-    position: fixed;
-    bottom: 0px;
-    width: 200px;
-    height: 80px;
-    display: flex;
-    background: none;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-}
 
-.logo-img {
-    animation: 3s rotate linear infinite;
-    animation-play-state: paused;
-    transform-origin: 50% 50%;
-}
-
-.flecha {
-    position: fixed;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: -22%;
-    margin-left: 40%
-}
-
-.slider {
-    width: 85%;
-    height: 506px;
-    margin-left: -10%;
-    overflow-x: hidden;
-    overflow-y: hidden;
-}
-
-.slider ul {
-    padding: 0;
-    display: flex;
-    width: 400%;
-}
-
-.slider li {
-    width: 100%;
-    list-style: none;
-}
-
-.div-portada {
-    position: relative;
-    display: inline-table;
-    text-align: center;
-    transition: opacity 1s;
-    width: 40%;
-    border-radius: 6px;
-    background-color: rgb(206, 200, 181);
-}
-
-.div-noticia {
-    position: relative;
-    display: inline-table;
-    text-align: center;
-    transition: opacity 1s;
-    opacity: 0;
-    width: 40%;
-    border-radius: 6px;
-    background-color: rgb(206, 200, 181);
-}
-
-.barraCurrent {
-    position: relative;
-    top: -19px;
-    display: flex;
-    width: 300%;
-    height: 15px;
-    margin-left: 100%;
-}
-
-.range-volume {
-    position: relative;
-    display: none;
-    bottom: 43px;
-    width: 0% !important;
-    height: 5px !important;
-    margin-left: 3%;
-}
-
-.current-time {
-    position: relative;
-    color: rgb(136, 129, 107);
-    top: 2.3px;
-}
-
-.divId {
-    margin-left: -370px;
-    width: 290px;
-}
-
-.identificador-animado {
-    overflow: hidden;
-}
-
-.identificador-texto {
-    color: rgb(136, 129, 107);
-    animation-iteration-count: infinite;
-    animation-delay: initial;
-    animation-timing-function: linear;
-    animation-duration: 10s;
-    animation-name: slidein-nameAudio;
-}
-
-.contenedor-reproductor {
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
-    height: 84px;
-    padding: 17px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.473);
-}
-
-.boton-contenedor-secundario {
-    margin-bottom: 10px;
-}
-
-.boton-contenedor-tercero {
-    margin-bottom: 20px;
-}
-
-.boton-contenedor-mute {
-    position: absolute;
-    display: inline;
-    margin-top: -75px;
-    margin-left: 120px;
-}
-
-.mute-button {
-    margin-left: 39px;
-}
-
-.boton-contenedor-mute:hover .range-volume {
-    /*animation: 1s slidein-range-volume;*/
-    display: flex;
-    width: 50% !important;
-}
+/*FIN*/
 
 
-/*.boton-contenedor-mute:not(:hover) .range-volume{
-    animation: 1s slidein-range-volume-goback;
-    display:none;
-    width: 0% !important;
-}*/
-
-.boton-contenedor-mute:hover .mute-button {
-    margin-left: 0px
-}
-
-.div-contenedor-galeria {
-    display: inline-block;
-    width: 50%;
-}
-
-.button-nav {
-    background-color: rgba(0, 0, 0, 0.137);
-    display: block;
-    width: 100%;
-    height: 6%;
-    border: none;
-    border-radius: 4%;
-    cursor: pointer;
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: rgb(136, 129, 107);
-}
-
-.button-nav:hover {
-    width: 110%;
-    color: rgb(192, 171, 104);
-}
-
-.button {
-    border: none;
-    border-radius: 4px;
-    padding: 10px;
-    text-transform: uppercase;
-    cursor: pointer;
-    font-weight: 500;
-    background-color: rgb(158, 140, 80);
-    color: rgb(51, 46, 29);
-}
-
-.img-usuario {
-    margin: 20px 0;
-    width: 50%;
-    height: 16%;
-    border-radius: 50%;
-}
-
-.img-noticias {
-    width: 80% !important;
-    height: 45% !important;
-}
-
-.saludo {
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 15px;
-    margin-bottom: 30px;
-}
-
-.titular {
-    text-transform: uppercase;
-    font-size: 40px;
-    text-align: center;
-}
-
-.contenedor-noticias {
-    display: flex;
-    flex-flow: row wrap;
-    align-self: center;
-    width: 40%;
-    height: 380px;
-    position: relative;
-    left: 30%;
-    overflow-y: scroll;
-}
-
-.div-noticias {
-    flex: 1 1 1;
-    border-radius: 6px;
-    height: 350px;
-    border: 2px solid rgb(206, 200, 181);
-    background-color: rgb(206, 200, 181);
-    margin: 10px;
-    width: 50%;
-}
+/*ANIMACIONES*/
 
 @keyframes slidein-nameAudio {
     from {
@@ -449,19 +489,6 @@ h2 {
     }
 }
 
-
-/*@keyframes slideinNoticias {
-    from {
-      margin-left: -100%;
-      width: 40%
-    }
-  
-    to {
-      margin-left: -200%;
-      width: 40%;
-    }
-}*/
-
 @keyframes slidein {
     from {
         margin-left: 100%;
@@ -472,3 +499,6 @@ h2 {
         width: 100%;
     }
 }
+
+
+/*FIN*/

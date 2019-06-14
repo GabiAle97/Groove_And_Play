@@ -37,68 +37,88 @@
     </ul>
 </div>
 <script>
-    var flechaDerecha = document.getElementById("flechaDerecha");
-    var flechaIzquierda = document.getElementById("flechaIzquierda");
-    var click=0;
-
-    flechaDerecha.addEventListener("click", function(){
-        switch(click){
-            case 0 : 
-                flechaIzquierda.style.display = "flex";
-                siguiente("divPortada","divContraportada","-200%");
-                click++;
-                break;
-            case 1 : 
-                flechaIzquierda.style.display = "flex";
-                flechaDerecha.style.display = "none";
-                siguiente("divContraportada","divTracklist","-400%");
-                click++;
-                break;       
-        }
-    })
-
-    flechaIzquierda.addEventListener("click", function(){
-        switch(click){
-            case 2 : 
-                flechaDerecha.style.display = "flex";
-                anterior("divTracklist","divContraportada","-200%");
-                click--;
-                break;
-            case 1 : 
-                flechaDerecha.style.display = "flex";
-                flechaIzquierda.style.display = "none";
-                anterior("divContraportada","divPortada","0%");
-                click--;
-                break;       
-        }
-    })
-
-    function siguiente(actual,siguiente,porcentaje){
-        var divPortada = document.getElementById(actual);
-        var divNoticia = document.getElementById(siguiente);
-        var divSlider = document.getElementById("sliderNoticia");
-        divPortada.style.opacity=0;
-        divNoticia.style.opacity=100;
-        divNoticia.style.marginLeft = porcentaje;
-        if (siguiente == "divTracklist"){
-            divSlider.style.overflowY = "scroll";
-        }else{
-            divSlider.style.overflowY = "hidden";
-        }
-    }
-
-    function anterior(actual,siguiente,porcentaje){
-        var divPortada = document.getElementById(actual);
-        var divNoticia = document.getElementById(siguiente);
-        var divSlider = document.getElementById("sliderNoticia");
-        divPortada.style.opacity=0;
-        divNoticia.style.opacity=100;
-        divNoticia.style.marginLeft = porcentaje;
-        if (siguiente == "divTracklist"){
-            divSlider.style.overflowY = "scroll";
-        }else{
-            divSlider.style.overflowY = "hidden";
-        }
-    }
-
+  //declaro la variable "flechaDerecha" que toma como valor el elemento con ID "flechaDerecha" 
+  var flechaDerecha = document.getElementById("flechaDerecha");
+  //declaro la variable "flechaIzquierda" que toma como valor el elemento con ID "flechaIzquierda" 
+  var flechaIzquierda = document.getElementById("flechaIzquierda");
+  //declaro la variable "click" igualada a 0 (cantidad de veces que me muevo de pantalla en pantalla)
+  var click=0;
+  //añado un listener de tipo "click" (cada vez que el usuario realice un click) al elemento "flechaDerecha"
+  flechaDerecha.addEventListener("click", function(){
+    //realizo un switch por cada opcion posible, en referencia a la variable "click"
+      switch(click){
+          //en caso de que "click" valga 0 (click desde la seccion de "portada")
+          case 0 : 
+              //modifico el display del elemento "flechaIzquierda" a "flex", para que el mismo se vea dentro del DOM
+              flechaIzquierda.style.display = "flex";
+              //ejecuto la funcion "siguiente" con los parametros necesarios para mostrar la contraportada del disco
+              cambiarSeccion("divPortada","divContraportada","-200%");
+              //añado una unidad a la variable "click", valiendo 1
+              click++;
+              break;
+          //en caso de que "click" valga 1 (click desde la seccion de "contraportada")
+          case 1 : 
+              //modifico el display del elemento "flechaIzquierda" a "flex", para que el mismo se vea dentro del DOM
+              flechaIzquierda.style.display = "flex";
+              //modifico el display del elemento "flechaDerecha" a "none", para que el mismo no se vea dentro del DOM
+              flechaDerecha.style.display = "none";
+              //ejecuto la funcion "siguiente" con los parametros necesarios para mostrar el tracklist del disco
+              cambiarSeccion("divContraportada","divTracklist","-400%");
+              //añado una unidad a la variable "click", valiendo 2
+              click++;
+              break;       
+      }
+  })
+  //añado un listener de tipo "click" (cada vez que el usuario realice un click) al elemento "flechaIzquierda"
+  flechaIzquierda.addEventListener("click", function(){
+      //realizo un switch por cada opcion posible, en referencia a la variable "click"
+      switch(click){
+          //en caso de que "click" valga 2 (click desde la seccion de "tracklist")
+          case 2 : 
+              //modifico el display del elemento "flechaDerecha" a "flex", para que el mismo se vea dentro del DOM
+              flechaDerecha.style.display = "flex";
+              //ejecuto la funcion "anterior" con los parametros necesarios para mostrar la contraportada del disco
+              cambiarSeccion("divTracklist","divContraportada","-200%");
+              //sustraigo una unidad a la variable "click", valiendo 1
+              click--;
+              break;
+          //en caso de que "click" valga 1 (click desde la seccion de "contraportada")
+          case 1 : 
+              //modifico el display del elemento "flechaDerecha" a "flex", para que el mismo se vea dentro del DOM
+              flechaDerecha.style.display = "flex";
+              //modifico el display del elemento "flechaIzquierda" a "none", para que el mismo no se vea dentro del DOM
+              flechaIzquierda.style.display = "none";
+              //ejecuto la funcion "anterior" con los parametros necesarios para mostrar la portada del disco
+              cambiarSeccion("divContraportada","divPortada","0%");
+              //sustraigo una unidad a la variable "click", valiendo 0
+              click--;
+              break;       
+      }
+  })
+  //funcion que cambia la sección de la visualizacion del disco a la siguiente 
+  function cambiarSeccion(actual,siguiente,porcentaje){
+      //declaro la variable "divPortada" que toma como valor el elemento con ID que recibe la funcion 
+      //desde el parametro "actual"
+      var divPortada = document.getElementById(actual);
+      //declaro la variable "divNoticia" que toma como valor el elemento con ID que recibe la funcion 
+      //desde el parametro "siguiente"
+      var divNoticia = document.getElementById(siguiente);
+      //declaro la variable "divPortada" que toma como valor el elemento con ID "sliderNoticia" (contenedor de las secciones)
+      var divSlider = document.getElementById("sliderNoticia");
+      //establezco la opacidad del elemento "divPortada" a 0, para que éste realice un "fade out" hasta ocultarse
+      divPortada.style.opacity=0;
+      //establezco la opacidad del elemento "divNoticia" a 100, para que éste realice un "fade in" hasta verse completamente
+      divNoticia.style.opacity=100;
+      //Desplazo el elemento "divNoticia" hacia la izquierda, a la distancia que le establezco desde el parametro "porcentaje"
+      divNoticia.style.marginLeft = porcentaje;
+      //si la variable "siguiente" es igual a "divTracklist"
+      if (siguiente == "divTracklist"){
+          //agrego una barra scroll lateral, para poder visualizar 
+          //todos los archivos de audio que sobrepasen el espacio del elemento "divSlider"
+          divSlider.style.overflowY = "scroll";
+      }else{
+          //Oculto todo lo que esté fuera del espacio del elemento "divSlider"
+          divSlider.style.overflowY = "hidden";
+      }
+  }
 </script>

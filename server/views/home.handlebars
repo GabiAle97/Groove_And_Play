@@ -10,28 +10,10 @@
   {{#each listaDiscos}}
     <div
       class="div-noticias"
-      onclick="window.location.href='/notices/?id=
-        {{this.nombre}}
-         |
-        {{this.usuario}}
-         '"
-    >
+      onclick="window.location.href='/notices/?id={{this.nombre}}|{{this.usuario}}'">
       <h4>
-        <i style="color: rgb(158, 140, 80)">
-          {{this.usuario}}
-        </i>
-        acaba de subir un disco!
-      </h4>
-      <img
-        class="img-noticias"
-        src="../files/
-          {{this.usuario}}
-           /
-          {{this.nombre}}
-           /portada/portada-
-          {{this.nombre}}
-           .jpg"
-       />
+        <i style="color: rgb(158, 140, 80)">{{this.usuario}}</i> acaba de subir un disco!</h4>
+      <img class="img-noticias" src="../files/{{this.usuario}}/{{this.nombre}}/portada/portada-{{this.nombre}}.jpg"/>
 
       <h2>
         {{this.nombre}}
